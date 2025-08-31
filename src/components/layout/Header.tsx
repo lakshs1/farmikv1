@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingCart, User, Menu, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,9 @@ export const Header = () => {
   const { user, signOut } = useAuth();
   const { items } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActivePage = (path: string) => location.pathname === path;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,16 +43,36 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-foreground hover:text-primary transition-colors">
+            <Link 
+              to="/" 
+              className={`text-foreground hover:text-primary transition-colors farm-hover ${
+                isActivePage('/') ? 'active-page' : ''
+              }`}
+            >
               Home
             </Link>
-            <Link to="/products" className="text-foreground hover:text-primary transition-colors">
+            <Link 
+              to="/products" 
+              className={`text-foreground hover:text-primary transition-colors farm-hover ${
+                isActivePage('/products') ? 'active-page' : ''
+              }`}
+            >
               Products
             </Link>
-            <Link to="/about" className="text-foreground hover:text-primary transition-colors">
+            <Link 
+              to="/about" 
+              className={`text-foreground hover:text-primary transition-colors farm-hover ${
+                isActivePage('/about') ? 'active-page' : ''
+              }`}
+            >
               About Us
             </Link>
-            <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
+            <Link 
+              to="/contact" 
+              className={`text-foreground hover:text-primary transition-colors farm-hover ${
+                isActivePage('/contact') ? 'active-page' : ''
+              }`}
+            >
               Contact
             </Link>
           </nav>

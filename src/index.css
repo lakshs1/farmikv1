@@ -4,61 +4,81 @@
 
 @layer base {
   :root {
-    /* Farmik Oils Brand Colors */
-    --primary: 42 88% 45%; /* Mustard yellow */
-    --primary-glow: 45 95% 65%; /* Lighter mustard */
-    --secondary: 95 35% 88%; /* Warm cream */
-    --accent: 120 45% 35%; /* Deep green */
-    --muted: 60 9% 98%; /* Warm white */
-    --muted-foreground: 25 5% 45%; /* Warm gray */
+    /* Farm Theme Colors - Yellow & Green */
+    --primary: 45 95% 50%; /* Bright mustard yellow */
+    --primary-foreground: 45 15% 15%; /* Dark for contrast */
+    --primary-glow: 45 100% 65%; /* Lighter mustard glow */
     
-    /* UI Colors */
-    --background: 0 0% 100%; /* Pure white */
-    --foreground: 24 10% 10%; /* Warm black */
+    --secondary: 120 40% 25%; /* Deep forest green */
+    --secondary-foreground: 0 0% 98%; /* Light text */
+    
+    --accent: 85 60% 45%; /* Olive green */
+    --accent-foreground: 0 0% 98%;
+    
+    --muted: 45 40% 95%; /* Warm cream */
+    --muted-foreground: 45 15% 40%; /* Muted text */
+    
+    --background: 45 60% 98%; /* Warm white background */
+    --foreground: 45 15% 15%; /* Dark warm text */
+    
     --card: 0 0% 100%;
-    --card-foreground: 24 10% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 24 10% 10%;
-    --border: 20 6% 90%; /* Warm border */
-    --input: 20 6% 90%;
-    --ring: 42 88% 45%; /* Primary focus ring */
+    --card-foreground: 45 15% 15%;
     
-    /* State Colors */
+    --popover: 0 0% 100%;
+    --popover-foreground: 45 15% 15%;
+    
+    --border: 45 30% 85%; /* Warm border */
+    --input: 45 30% 90%;
+    --ring: 45 95% 50%; /* Yellow focus ring */
+    
+    /* State Colors with Farm Theme */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     
-    /* Gradients */
+    --warning: 45 95% 50%; /* Yellow warning */
+    --warning-foreground: 45 15% 15%;
+    
+    --success: 120 40% 35%; /* Green success */
+    --success-foreground: 0 0% 98%;
+    
+    /* Farm-themed Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--accent) / 0.1));
+    --gradient-farm: linear-gradient(45deg, hsl(45 95% 50% / 0.1), hsl(120 40% 25% / 0.1));
+    --gradient-field: linear-gradient(180deg, hsl(85 60% 45% / 0.2), hsl(45 95% 50% / 0.1));
     
-    /* Shadows */
+    /* Enhanced Shadows */
     --shadow-warm: 0 10px 30px -10px hsl(var(--primary) / 0.3);
     --shadow-card: 0 4px 20px -5px hsl(var(--primary) / 0.15);
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.2);
     
-    /* Radius */
-    --radius: 0.5rem;
+    /* Animation Variables */
+    --wave-duration: 3s;
+    --hover-scale: 1.02;
+    
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 24 10% 8%;
-    --foreground: 0 0% 95%;
-    --card: 24 10% 10%;
-    --card-foreground: 0 0% 95%;
-    --popover: 24 10% 10%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 42 88% 55%;
-    --primary-foreground: 24 10% 10%;
-    --secondary: 24 10% 15%;
+    --background: 45 15% 8%; /* Dark farm theme */
+    --foreground: 45 20% 95%;
+    --card: 45 15% 10%;
+    --card-foreground: 45 20% 95%;
+    --popover: 45 15% 10%;
+    --popover-foreground: 45 20% 95%;
+    --primary: 45 95% 60%; /* Brighter yellow in dark */
+    --primary-foreground: 45 15% 8%;
+    --secondary: 120 40% 35%; /* Adjusted green for dark */
     --secondary-foreground: 0 0% 95%;
-    --muted: 24 10% 15%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 120 45% 45%;
-    --accent-foreground: 0 0% 95%;
-    --destructive: 0 62% 30%;
+    --muted: 45 15% 15%;
+    --muted-foreground: 45 10% 65%;
+    --accent: 85 50% 55%; /* Lighter olive for dark */
+    --accent-foreground: 45 15% 8%;
+    --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 95%;
-    --border: 24 10% 15%;
-    --input: 24 10% 15%;
-    --ring: 42 88% 55%;
+    --border: 45 15% 20%;
+    --input: 45 15% 20%;
+    --ring: 45 95% 60%;
   }
 }
 
@@ -71,6 +91,69 @@
   }
   h1 {
     @apply text-3xl font-bold text-foreground;
+  }
+}
+
+/* Farm Theme Animations and Effects */
+@layer components {
+  .mustard-wave {
+    background: linear-gradient(
+      45deg,
+      hsl(var(--primary) / 0.1) 0%,
+      hsl(var(--accent) / 0.1) 25%,
+      hsl(var(--primary) / 0.2) 50%,
+      hsl(var(--accent) / 0.1) 75%,
+      hsl(var(--primary) / 0.1) 100%
+    );
+    background-size: 400% 400%;
+    animation: wave-flow var(--wave-duration) ease-in-out infinite;
+  }
+  
+  .farm-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .farm-hover:hover {
+    transform: scale(var(--hover-scale));
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .active-page {
+    position: relative;
+  }
+  
+  .active-page::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: hsl(var(--primary));
+    border-radius: 2px;
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+  
+  .flower-rating {
+    filter: hue-rotate(45deg) saturate(1.2);
+  }
+}
+
+@keyframes wave-flow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px hsl(var(--primary) / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px hsl(var(--primary) / 0.8);
   }
 }
 

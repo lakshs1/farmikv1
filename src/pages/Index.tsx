@@ -10,14 +10,14 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-background to-accent/10 py-20">
+      <section className="relative bg-gradient-to-br from-primary/10 via-background to-accent/10 py-20 mustard-wave">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/20">
+              <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/20 farm-hover">
                 Premium Cold-Pressed
               </Badge>
-              <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6">
+              <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 animate-float">
                 Pure <span className="text-primary">Mustard Oil</span> from Traditional Methods
               </h1>
               <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -26,24 +26,24 @@ const Index = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/products">
-                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary-glow hover:opacity-90">
+                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 farm-hover">
                     <ShoppingCart className="mr-2 h-5 w-5" />
                     Shop Now
                   </Button>
                 </Link>
                 <Link to="/about">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto farm-hover">
                     Learn More
                   </Button>
                 </Link>
               </div>
             </div>
             <div className="relative">
-              <div className="bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl p-8">
+              <div className="bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl p-8 farm-hover">
                 <img 
                   src={mustardOilProduct} 
                   alt="Premium Cold-Pressed Mustard Oil - Best Quality Healthy Oil"
-                  className="w-full h-auto max-w-md mx-auto rounded-2xl shadow-2xl"
+                  className="w-full h-auto max-w-md mx-auto rounded-2xl shadow-2xl farm-hover"
                 />
               </div>
             </div>
