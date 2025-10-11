@@ -51,8 +51,8 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
               firstname: user.user_metadata.full_name || "customer",
               email: user.email || "customer@mail.com",
               phone: user.phone ||"9876543210",
-              surl: "https://myfarmik.com/cart",
-              furl: "https://myfarmik.com/cart",
+              surl: "https://farmik.netlify.app/cart",
+              furl: "https://farmik.netlify.app/cart",
             }),
           }
         );
