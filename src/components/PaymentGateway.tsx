@@ -6,6 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { CreditCard, Truck, Smartphone, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {useAuth} from "@/hooks/useAuth";
 
 interface PaymentGatewayProps {
   totalAmount: number;
@@ -17,49 +18,73 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
   const [selectedMethod, setSelectedMethod] = useState("cod");
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+
 
   const handlePayment = async () => {
     setProcessing(true);
 
     try {
       if (selectedMethod === "cod") {
-        // Cash on Delivery - process immediately
+        // ✅ Cash on Delivery
         setTimeout(() => {
           onPaymentSuccess("cash_on_delivery");
           toast({
             title: "Order placed successfully!",
             description: "Your order will be delivered and payment collected at your doorstep.",
           });
+          setProcessing(false);
         }, 1000);
       } else if (selectedMethod === "online") {
-        // Online payment - integrate with PhonePe
-        const PHONEPE_API_KEY = process.env.REACT_APP_PHONEPE_API_KEY;
-        
-        if (!PHONEPE_API_KEY) {
-          toast({
-            title: "Payment Gateway Error",
-            description: "PhonePe API key not configured. Please contact support.",
-            variant: "destructive",
-          });
-          setProcessing(false);
-          return;
+        // ✅ PayU integration via Supabase Edge Function
+        const response = await fetch(
+          "https://liolbsrurnunulzlpprk.supabase.co/functions/v1/createpayuorder",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json",
+              "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxpb2xic3J1cm51bnVsemxwcHJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0ODg0MTAsImV4cCI6MjA3MjA2NDQxMH0.pfNSqW5-ieGxlWc4MqkY7qZRXh2T7-O2vVXl-oLLdKU",   // required
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxpb2xic3J1cm51bnVsemxwcHJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0ODg0MTAsImV4cCI6MjA3MjA2NDQxMH0.pfNSqW5-ieGxlWc4MqkY7qZRXh2T7-O2vVXl-oLLdKU"
+             },
+            body: JSON.stringify({
+              amount: totalAmount,
+              productinfo: "Order",
+              firstname: user.user_metadata.full_name || "customer",
+              email: user.email || "customer@mail.com",
+              phone: user.phone ||"9876543210",
+              surl: "https://myfarmik.com/cart",
+              furl: "https://myfarmik.com/cart",
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to create PayU order");
         }
 
-        // Simulate PhonePe integration
-        // In production, this would make actual API calls to PhonePe
-        setTimeout(() => {
-          const mockPaymentId = `PHONEPE_${Date.now()}`;
-          onPaymentSuccess("online_payment", mockPaymentId);
-          toast({
-            title: "Payment successful!",
-            description: `Payment completed via PhonePe. ID: ${mockPaymentId}`,
-          });
-        }, 2000);
+        const data = await response.json();
+
+        // Create hidden form & submit to PayU Hosted Checkout
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = data.action; // PayU URL
+        form.style.display = "none";
+
+        const fields = ["key","txnid","amount","productinfo","firstname","email","phone","surl",
+        "furl","hash"];
+        fields.forEach((field) => {
+          const input = document.createElement("input");
+          input.name = field;
+          input.value = data[field];
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit(); //  Redirects user to PayU secure page
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Payment failed",
-        description: "Something went wrong. Please try again.",
+        description: error.message || "Unable to process payment. Try again.",
         variant: "destructive",
       });
       setProcessing(false);
@@ -75,11 +100,13 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Amount */}
         <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
           <span className="font-medium">Total Amount:</span>
-          <span className="text-2xl font-bold text-primary">₹{totalAmount.toFixed(2)}</span>
+          <span className="text-2xl font-bold text-primary">₹{(totalAmount).toFixed(2)}</span>
         </div>
 
+        {/* Payment options */}
         <RadioGroup value={selectedMethod} onValueChange={setSelectedMethod}>
           <div className="flex items-center space-x-2 p-4 border rounded-lg">
             <RadioGroupItem value="cod" id="cod" />
@@ -98,22 +125,23 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
               <Smartphone className="h-5 w-5 text-primary" />
               <div>
                 <p className="font-medium">Online Payment</p>
-                <p className="text-sm text-muted-foreground">Pay securely via PhonePe</p>
+                <p className="text-sm text-muted-foreground">Redirect to PayU for secure payment</p>
               </div>
             </Label>
           </div>
         </RadioGroup>
 
+        {/* Warning note */}
         {selectedMethod === "online" && (
           <div className="p-4 bg-warning/10 border border-warning/20 rounded-lg">
             <div className="flex items-start space-x-2">
               <AlertCircle className="h-5 w-5 text-warning mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-warning-foreground">
-                  API Configuration Required
+                  You’ll be redirected to PayU’s secure checkout
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Add your PhonePe API key to environment variables as REACT_APP_PHONEPE_API_KEY
+                  Please don’t refresh or close the window during payment
                 </p>
               </div>
             </div>
@@ -122,6 +150,7 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
 
         <Separator />
 
+        {/* Action buttons */}
         <div className="flex space-x-3">
           <Button
             variant="outline"
@@ -134,7 +163,7 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
           <Button
             onClick={handlePayment}
             disabled={processing}
-            className="flex-1 bg-primary hover:bg-primary/90 farm-hover"
+            className="flex-1 bg-primary hover:bg-primary/90"
           >
             {processing ? (
               <div className="flex items-center space-x-2">
@@ -150,12 +179,6 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
             )}
           </Button>
         </div>
-
-        {selectedMethod === "online" && (
-          <p className="text-xs text-center text-muted-foreground">
-            You will be redirected to PhonePe for secure payment
-          </p>
-        )}
       </CardContent>
     </Card>
   );
