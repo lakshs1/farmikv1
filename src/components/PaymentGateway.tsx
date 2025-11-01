@@ -7,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { CreditCard, Truck, Smartphone, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {useAuth} from "@/hooks/useAuth";
-// import PayuPaymentPage from "./PayuPaymentPage.tsx";
 
 interface PaymentGatewayProps {
   totalAmount: number;
@@ -15,30 +14,8 @@ interface PaymentGatewayProps {
   onCancel: () => void;
 }
 
-interface PayuData {
-  amount: number;
-  productioninfo: string;
-  firstname: string;
-  email: string;
-  phone: string;
-  surl: string;
-  furl: string;
-}
-
 const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGatewayProps) => {
   const [selectedMethod, setSelectedMethod] = useState("cod");
-  const [hash, setHash] = useState('');
-  const [transactionId, setTransactionId] = useState('');
-  const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<PayuData>({
-    amount: 0,
-  productioninfo: "",
-  firstname: "",
-  email: "",
-  phone: "",
-  surl: "",
-  furl: ""
-  });
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -74,8 +51,8 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
               firstname: user.user_metadata.full_name || "customer",
               email: user.email || "customer@mail.com",
               phone: user.phone ||"9876543210",
-              surl: "https://farmik.netlify.app/cart",
-              furl: "https://farmik.netlify.app/cart",
+              surl: "https://liolbsrurnunulzlpprk.supabase.co/functions/v1/payu-success",
+              furl: "https://liolbsrurnunulzlpprk.supabase.co/functions/v1/payu-failure",
             }),
           }
         );
@@ -85,10 +62,6 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
         }
 
         const data = await response.json();
-        setHash(data.hash);
-        setTransactionId(data.txnid);
-        setOpen(true);
-        setFormData(data);
 
         // Create hidden form & submit to PayU Hosted Checkout
         const form = document.createElement("form");
@@ -206,9 +179,6 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
             )}
           </Button>
         </div>
-        {/* {
-          open && <PayuPaymentPage data={formData} hash={hash} transactionId={transactionId} open={open}/>
-        } */}
       </CardContent>
     </Card>
   );
