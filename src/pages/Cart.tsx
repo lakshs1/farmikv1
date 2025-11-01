@@ -11,6 +11,7 @@ import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import PaymentGateway from "@/components/PaymentGateway";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from "lucide-react";
 
 interface Product {
@@ -31,6 +32,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [shippingAddress, setShippingAddress] = useState("");
+  const [showPayment, setShowPayment] = useState(false);
   const { user } = useAuth();
   const { items: cartItemsFromHook, clearCart } = useCart();
   const navigate = useNavigate();
@@ -70,7 +72,7 @@ const Cart = () => {
         product: {
           id: item.products.id,
           name: item.products.name,
-          price: item.products.price,
+          price: (item.products.price), // Apply 20% discount
           image_url: item.products.image_url,
         }
       })) || [];
@@ -141,19 +143,20 @@ const Cart = () => {
   };
 
   const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + (item.product.price * item.quantity*0.8), 0);
   };
 
   const handleCheckout = async () => {
     if (!user || cartItems.length === 0) return;
-    if (!shippingAddress.trim()) {
-      toast({
-        title: "Error",
-        description: "Please provide a shipping address",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!shippingAddress || shippingAddress.trim().length === 0) {
+  toast({
+    title: "Error",
+    description: "Please provide a shipping address",
+    variant: "destructive",
+  });
+  return;
+}
+
 
     setCheckoutLoading(true);
 
@@ -167,7 +170,18 @@ const Cart = () => {
           user_id: user.id,
           total_amount: totalAmount,
           shipping_address: shippingAddress,
-          status: 'pending'
+          status: 'pending',
+          product_details: cartItems.map(item => ({
+            product_id: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity
+          })),
+          customer_name: user.user_metadata.full_name || "Customer",
+          customer_email: user.email,
+          customer_phone: user.user_metadata.phone || "",
+          quantity: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+          payment_mode: showPayment ? 'cash_on_delivery' : 'online_payment' // assuming payment is done if we reach here
         })
         .select()
         .single();
@@ -180,6 +194,7 @@ const Cart = () => {
         product_id: item.product.id,
         quantity: item.quantity,
         price: item.product.price
+
       }));
 
       const { error: itemsError } = await supabase
@@ -219,6 +234,19 @@ const Cart = () => {
   if (!user) {
     return null; // Will redirect to auth
   }
+const handlePaymentSuccess = async () => {
+  setShowPayment(false);
+  await handleCheckout(); // proceed to place order
+};
+
+const handlePaymentFailure = () => {
+  setShowPayment(false);
+  toast({
+    title: "Payment Failed",
+    description: "Your payment could not be processed.",
+    variant: "destructive",
+  });
+};
 
   if (loading) {
     return (
@@ -266,7 +294,7 @@ const Cart = () => {
           <div className="text-center">
             <ShoppingBag className="mx-auto h-24 w-24 text-muted-foreground mb-4" />
             <h2 className="text-2xl font-semibold text-foreground mb-2">Your cart is empty</h2>
-            <p className="text-muted-foreground mb-6">Add some premium mustard oil products to get started</p>
+            <p className="text-muted-foreground mb-6">Add some products to get started</p>
             <Button onClick={() => navigate("/products")}>
               Continue Shopping
             </Button>
@@ -286,7 +314,7 @@ const Cart = () => {
                       />
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground">{item.product.name}</h3>
-                        <p className="text-lg font-bold text-primary">₹{item.product.price.toFixed(2)}</p>
+                        <p className="text-lg font-bold text-primary">₹{(item.product.price*0.8).toFixed(2)}</p>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Button
@@ -331,7 +359,7 @@ const Cart = () => {
                     {cartItems.map((item) => (
                       <div key={item.id} className="flex justify-between text-sm">
                         <span>{item.product.name} × {item.quantity}</span>
-                        <span>₹{(item.product.price * item.quantity).toFixed(2)}</span>
+                        <span>₹{(item.product.price * item.quantity *0.8).toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
@@ -354,18 +382,37 @@ const Cart = () => {
                 </CardContent>
                 <CardFooter>
                   <Button
-                    className="w-full"
-                    onClick={handleCheckout}
-                    disabled={checkoutLoading || cartItems.length === 0}
-                  >
-                    {checkoutLoading ? "Processing..." : "Place Order"}
-                  </Button>
+  className="w-full"
+  onClick={() => setShowPayment(true)} // open payment modal first
+  disabled={checkoutLoading || cartItems.length === 0}
+>
+  {checkoutLoading ? "Processing..." : "Place Order"}
+</Button>
+
                 </CardFooter>
               </Card>
             </div>
           </div>
         )}
       </div>
+      {showPayment && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
+      <PaymentGateway
+        totalAmount={calculateTotal()}
+        onPaymentSuccess={handlePaymentSuccess}
+        onCancel={handlePaymentFailure}
+      />
+      <button
+        onClick={() => setShowPayment(false)}
+        className="mt-4 text-sm text-gray-500"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
