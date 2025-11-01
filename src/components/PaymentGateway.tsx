@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { CreditCard, Truck, Smartphone, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {useAuth} from "@/hooks/useAuth";
-import PayuPaymentPage from "./PayuPaymentPage.tsx";
+// import PayuPaymentPage from "./PayuPaymentPage.tsx";
 
 interface PaymentGatewayProps {
   totalAmount: number;
@@ -91,22 +91,22 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
         setFormData(data);
 
         // Create hidden form & submit to PayU Hosted Checkout
-        // const form = document.createElement("form");
-        // form.method = "POST";
-        // form.action = data.action; // PayU URL
-        // form.style.display = "none";
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = data.action; // PayU URL
+        form.style.display = "none";
 
-        // const fields = ["key","txnid","amount","productinfo","firstname","email","phone","surl",
-        // "furl","hash"];
-        // fields.forEach((field) => {
-        //   const input = document.createElement("input");
-        //   input.name = field;
-        //   input.value = data[field];
-        //   form.appendChild(input);
-        // });
+        const fields = ["key","txnid","amount","productinfo","firstname","email","phone","surl",
+        "furl","hash"];
+        fields.forEach((field) => {
+          const input = document.createElement("input");
+          input.name = field;
+          input.value = data[field];
+          form.appendChild(input);
+        });
 
-        // document.body.appendChild(form);
-        // form.submit(); //  Redirects user to PayU secure page
+        document.body.appendChild(form);
+        form.submit(); //  Redirects user to PayU secure page
       }
     } catch (error: any) {
       toast({
@@ -206,9 +206,9 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
             )}
           </Button>
         </div>
-        {
+        {/* {
           open && <PayuPaymentPage data={formData} hash={hash} transactionId={transactionId} open={open}/>
-        }
+        } */}
       </CardContent>
     </Card>
   );
