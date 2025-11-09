@@ -13,6 +13,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import PaymentGateway from "@/components/PaymentGateway";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 interface Product {
   id: string;
@@ -33,17 +34,63 @@ const Cart = () => {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [shippingAddress, setShippingAddress] = useState("");
   const [showPayment, setShowPayment] = useState(false);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { items: cartItemsFromHook, clearCart } = useCart();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const status = params.get("status");
+
+  const createOrderHistory = async() => {
+    const txnid = params.get("txnid");
+    const amount = params.get("totalAmount");
+    const response = await fetch(
+          "https://liolbsrurnunulzlpprk.supabase.co/functions/v1/payuSuccess",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json",
+              "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxpb2xic3J1cm51bnVsemxwcHJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0ODg0MTAsImV4cCI6MjA3MjA2NDQxMH0.pfNSqW5-ieGxlWc4MqkY7qZRXh2T7-O2vVXl-oLLdKU",   // required
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxpb2xic3J1cm51bnVsemxwcHJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0ODg0MTAsImV4cCI6MjA3MjA2NDQxMH0.pfNSqW5-ieGxlWc4MqkY7qZRXh2T7-O2vVXl-oLLdKU"
+            },
+            body: JSON.stringify({
+              amount: amount,
+              productinfo: "Order",
+              firstname: "customer",
+              email: "customer@mail.com",
+              phone: "9876543210",
+              txnid: txnid
+            }),
+    });
+
+    if (response.status === 200) {
+      toast({
+        title: "Payment successful!",
+        description: "Your order has been placed successfully.",
+      });
+    }
+  }
 
   useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-      return;
+    if (status === "success") {
+      // Show toast or success UI
+      createOrderHistory();
+      // Maybe refresh order history
     }
-    fetchCartItems();
-  }, [user, navigate]);
+  }, [status]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchCartItems();
+    }
+  }, [authLoading, user]);
+
+  if (authLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    navigate("/auth");
+    return null;
+  }
 
   const fetchCartItems = async () => {
     if (!user) return;

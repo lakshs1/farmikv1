@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { CreditCard, Truck, Smartphone, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {useAuth} from "@/hooks/useAuth";
+import PayuPaymentPage from "./PayuPaymentPage.tsx";
 
 interface PaymentGatewayProps {
   totalAmount: number;
@@ -14,18 +15,40 @@ interface PaymentGatewayProps {
   onCancel: () => void;
 }
 
+interface PayuData {
+  amount: number;
+  productinfo: string;
+  firstname: string;
+  email: string;
+  phone: string;
+  surl: string;
+  furl: string;
+}
+
 const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGatewayProps) => {
   const [selectedMethod, setSelectedMethod] = useState("cod");
+  const [hash, setHash] = useState('');
+  const [transactionId, setTransactionId] = useState('');
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState<PayuData>({
+    amount: 0,
+  productinfo: "",
+  firstname: "",
+  email: "",
+  phone: "",
+  surl: "",
+  furl: ""
+  });
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
 
-  const handlePayment = async () => {
+  const handlePayment = async (value: string) => {
     setProcessing(true);
-
+    console.log("Value is ",value);
     try {
-      if (selectedMethod === "cod") {
+      if (selectedMethod === "cod" && value === "cod") {
         // ✅ Cash on Delivery
         setTimeout(() => {
           onPaymentSuccess("cash_on_delivery");
@@ -35,8 +58,10 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
           });
           setProcessing(false);
         }, 1000);
-      } else if (selectedMethod === "online") {
+      } else {
         // ✅ PayU integration via Supabase Edge Function
+        console.log("Entered in else");
+        const txnid = "TXN" + Date.now();
         const response = await fetch(
           "https://liolbsrurnunulzlpprk.supabase.co/functions/v1/createpayuorder",
           {
@@ -51,8 +76,8 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
               firstname: user.user_metadata.full_name || "customer",
               email: user.email || "customer@mail.com",
               phone: user.phone ||"9876543210",
-              surl: "https://liolbsrurnunulzlpprk.supabase.co/functions/v1/payu-success",
-              furl: "https://liolbsrurnunulzlpprk.supabase.co/functions/v1/payu-failure",
+              surl: `http://localhost:8081/cart?status=success&totalAmount=${totalAmount}&txnid=${txnid}`,
+              furl: "https://liolbsrurnunulzlpprk.supabase.co/functions/v1/payuFailure",
             }),
           }
         );
@@ -62,24 +87,30 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
         }
 
         const data = await response.json();
+        setHash(data.hash);
+        setTransactionId(data.txnid);
+        setOpen(true);
+        setFormData(data);
+
+        console.log("Data is ",data);
 
         // Create hidden form & submit to PayU Hosted Checkout
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = data.action; // PayU URL
-        form.style.display = "none";
+        // const form = document.createElement("form");
+        // form.method = "POST";
+        // form.action = data.action; // PayU URL
+        // form.style.display = "none";
 
-        const fields = ["key","txnid","amount","productinfo","firstname","email","phone","surl",
-        "furl","hash"];
-        fields.forEach((field) => {
-          const input = document.createElement("input");
-          input.name = field;
-          input.value = data[field];
-          form.appendChild(input);
-        });
+        // const fields = ["key","txnid","amount","productinfo","firstname","email","phone","surl",
+        // "furl","hash"];
+        // fields.forEach((field) => {
+        //   const input = document.createElement("input");
+        //   input.name = field;
+        //   input.value = data[field];
+        //   form.appendChild(input);
+        // });
 
-        document.body.appendChild(form);
-        form.submit(); //  Redirects user to PayU secure page
+        // document.body.appendChild(form);
+        // form.submit(); //  Redirects user to PayU secure page
       }
     } catch (error: any) {
       toast({
@@ -107,7 +138,10 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
         </div>
 
         {/* Payment options */}
-        <RadioGroup value={selectedMethod} onValueChange={setSelectedMethod}>
+        <RadioGroup value={selectedMethod} onValueChange={(value) => {
+    setSelectedMethod(value);
+    if (value === "online") handlePayment(value);
+  }}>
           <div className="flex items-center space-x-2 p-4 border rounded-lg">
             <RadioGroupItem value="cod" id="cod" />
             <Label htmlFor="cod" className="flex items-center space-x-3 cursor-pointer flex-1">
@@ -120,7 +154,7 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
           </div>
 
           <div className="flex items-center space-x-2 p-4 border rounded-lg">
-            <RadioGroupItem value="online" id="online" />
+            <RadioGroupItem value="online" id="online"/>
             <Label htmlFor="online" className="flex items-center space-x-3 cursor-pointer flex-1">
               <Smartphone className="h-5 w-5 text-primary" />
               <div>
@@ -152,7 +186,19 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
 
         {/* Action buttons */}
         <div className="flex space-x-3">
-          <Button
+          <form name="payu" method="post" action="https://secure.payu.in/_payment">
+          <input type="hidden" name="key" value="5QR9hy" />
+          <input type="hidden" name="txnid" value={transactionId} />
+          <input type="hidden" name="amount" value={formData.amount} />
+          <input type="hidden" name="productinfo" value={formData.productinfo} />
+          <input type="hidden" name="firstname" value={formData.firstname} />
+          <input type="hidden" name="email" value={formData.email} />
+          <input type="hidden" name="phone" value={formData.phone} />
+          <input type="hidden" name="surl" value={formData.surl} />
+          <input type="hidden" name="furl" value={formData.furl} />
+          <input type="hidden" name="hash" value={hash} />
+        <div>
+        <Button
             variant="outline"
             onClick={onCancel}
             className="flex-1"
@@ -160,8 +206,7 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
           >
             Cancel
           </Button>
-          <Button
-            onClick={handlePayment}
+          {/* <Button
             disabled={processing}
             className="flex-1 bg-primary hover:bg-primary/90"
           >
@@ -177,8 +222,14 @@ const PaymentGateway = ({ totalAmount, onPaymentSuccess, onCancel }: PaymentGate
                 {selectedMethod === "cod" ? "Place Order" : "Pay Now"}
               </>
             )}
-          </Button>
+          </Button> */}
+          <button type="submit">Pay now</button>
+      </div>
+    </form>
         </div>
+        {/* {
+          open && <PayuPaymentPage data={formData} hash={hash} transactionId={transactionId} open={open}/>
+        } */}
       </CardContent>
     </Card>
   );
