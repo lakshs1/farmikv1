@@ -17,6 +17,8 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import BlogList from "./pages/BlogList";
+import BlogDetail from "./pages/BlogDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +45,9 @@ const App = () => (
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  <Route path="/blog" element={<BlogList />} />
+                  <Route path="/blog/category/:categorySlug" element={<BlogList />} />
+                  <Route path="/blog/:slug" element={<BlogDetail />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

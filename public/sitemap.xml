@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Core Pages -->
+  <url>
+    <loc>https://myfarmik.com/</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://myfarmik.com/products</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://myfarmik.com/about</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://myfarmik.com/contact</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Blog Core -->
+  <url>
+    <loc>https://myfarmik.com/blog</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blog Categories -->
+  <url>
+    <loc>https://myfarmik.com/blog/category/cold-pressed-oils</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://myfarmik.com/blog/category/mustard-oil</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://myfarmik.com/blog/category/groundnut-oil</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://myfarmik.com/blog/category/coconut-oil</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://myfarmik.com/blog/category/sesame-oil</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog Articles -->
+  <url>
+    <loc>https://myfarmik.com/blog/why-cold-pressed-mustard-oil-is-a-superfood-for-your-heart</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://myfarmik.com/src/assets/mustard-oil-product.jpg</image:loc>
+      <image:title>Why Cold-Pressed Mustard Oil is a Superfood for Your Heart</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://myfarmik.com/blog/the-ultimate-guide-to-cold-pressed-vs-refined-oils</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://myfarmik.com/src/assets/mustard-oil-product.jpg</image:loc>
+      <image:title>The Ultimate Guide to Cold-Pressed vs. Refined Oils</image:title>
+    </image:image>
+  </url>
+
+</urlset>

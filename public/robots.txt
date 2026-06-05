@@ -12,3 +12,6 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+# Sitemap Registry
+Sitemap: https://myfarmik.com/sitemap.xml

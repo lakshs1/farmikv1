@@ -75,6 +75,14 @@ export const Header = () => {
             >
               Contact
             </Link>
+            <Link 
+              to="/blog" 
+              className={`text-foreground hover:text-primary transition-colors farm-hover ${
+                isActivePage('/blog') || location.pathname.startsWith('/blog') ? 'active-page' : ''
+              }`}
+            >
+              Blog
+            </Link>
           </nav>
 
           {/* Search Bar */}
@@ -171,6 +179,13 @@ export const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact
+              </Link>
+              <Link 
+                to="/blog" 
+                className="text-foreground hover:text-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Blog
               </Link>
               
               {/* Mobile Search */}
