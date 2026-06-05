@@ -72,15 +72,24 @@ export const Footer = () => {
             <ul className="space-y-2">
               <li className="flex items-center space-x-2 text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <span>+91 98765 43210</span>
+                <a href="tel:904-885-7266" className="hover:text-primary transition-colors">904-885-7266</a>
               </li>
-              <li className="flex items-center space-x-2 text-muted-foreground">
-                <Mail className="h-4 w-4" />
-                <span>info@farmikoils.com</span>
+              <li className="flex items-center space-x-2 text-muted-foreground flex-wrap">
+                <Mail className="h-4 w-4 flex-shrink-0" />
+                <a href="mailto:support@myfarmik.com" className="hover:text-primary transition-colors">support@myfarmik.com</a>
+                <span className="mx-1 text-muted-foreground">,</span>
+                <a href="mailto:care@myfarmik.com" className="hover:text-primary transition-colors">care@myfarmik.com</a>
               </li>
               <li className="flex items-start space-x-2 text-muted-foreground">
-                <MapPin className="h-4 w-4 mt-1" />
-                <span>123 Traditional Oil Mill<br />Mustard Fields, Punjab, India</span>
+                <MapPin className="h-4 w-4 mt-1 flex-shrink-0" />
+                <a 
+                  href="https://www.google.com/maps/place/Farmik/@28.6028927,77.3622366,214m/data=!3m2!1e3!4b1!4m6!3m5!1s0x390ce5d853fa9e83:0x3d629c2af3cac743!8m2!3d28.6028927!4d77.3628803!16s%2Fg%2F11xw3936yy?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-primary transition-colors"
+                >
+                  B-4, Block B, Sector 60,<br />Noida, Uttar Pradesh 201309
+                </a>
               </li>
             </ul>
           </div>

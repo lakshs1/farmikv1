@@ -74,7 +74,9 @@ const Contact = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground mb-1">Phone</h3>
-                        <p className="text-muted-foreground">+91 98765 43210</p>
+                        <p className="text-muted-foreground">
+                          <a href="tel:904-885-7266" className="hover:text-primary transition-colors">904-885-7266</a>
+                        </p>
                         <p className="text-sm text-muted-foreground">Mon-Sat 9:00 AM - 7:00 PM</p>
                       </div>
                     </div>
@@ -89,8 +91,12 @@ const Contact = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground mb-1">Email</h3>
-                        <p className="text-muted-foreground">info@farmikoils.com</p>
-                        <p className="text-muted-foreground">support@farmikoils.com</p>
+                        <p className="text-muted-foreground">
+                          <a href="mailto:support@myfarmik.com" className="hover:text-primary transition-colors">support@myfarmik.com</a>
+                        </p>
+                        <p className="text-muted-foreground">
+                          <a href="mailto:care@myfarmik.com" className="hover:text-primary transition-colors">care@myfarmik.com</a>
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -105,9 +111,15 @@ const Contact = () => {
                       <div>
                         <h3 className="font-semibold text-foreground mb-1">Address</h3>
                         <p className="text-muted-foreground">
-                          123 Traditional Oil Mill<br />
-                          Mustard Fields, Punjab 140001<br />
-                          India
+                          <a 
+                            href="https://www.google.com/maps/place/Farmik/@28.6028927,77.3622366,214m/data=!3m2!1e3!4b1!4m6!3m5!1s0x390ce5d853fa9e83:0x3d629c2af3cac743!8m2!3d28.6028927!4d77.3628803!16s%2Fg%2F11xw3936yy?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="hover:text-primary transition-colors"
+                          >
+                            B-4, Block B, Sector 60,<br />
+                            Noida, Uttar Pradesh 201309
+                          </a>
                         </p>
                       </div>
                     </div>
@@ -187,7 +199,7 @@ const Contact = () => {
                           type="tel"
                           value={formData.phone}
                           onChange={handleChange}
-                          placeholder="+91 98765 43210"
+                          placeholder="904-885-7266"
                         />
                       </div>
                       <div>
