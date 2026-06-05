@@ -1,4 +1,4 @@
-name: Deploy Farmik
+name: Deploy to Hostinger via SSH
 
 on:
   push:
@@ -6,30 +6,32 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
+          cache: npm
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Build Project
+      - name: Build project
         run: npm run build
 
       - name: Deploy to Hostinger
-        uses: appleboy/scp-action@v0.1.7
+        uses: easingthemes/ssh-deploy@main
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: 65002
-          source: "dist/*"
-          target: "/home/u265065463/domains/myfarmik.com/public_html"
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          REMOTE_HOST: 145.79.210.31
+          REMOTE_USER: u265065463
+          REMOTE_PORT: 65002
+          SOURCE: "dist/"
+          TARGET: "/home/u265065463/domains/myfarmik.com/public_html"
