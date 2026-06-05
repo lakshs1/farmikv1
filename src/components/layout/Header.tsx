@@ -38,7 +38,6 @@ export const Header = () => {
               alt="Farmik Oils - Premium Cold-Pressed Mustard Oil" 
               className="h-10 w-auto"
             />
-            <span className="font-bold text-xl text-primary">Farmik Oils</span>
           </Link>
 
           {/* Desktop Navigation */}
