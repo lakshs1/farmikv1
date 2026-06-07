@@ -278,52 +278,43 @@ export const BlogList = () => {
                 {/* 1. Featured Spotlight Post */}
                 {!selectedTag && !searchQuery && featuredPost && (
                   <article className="group overflow-hidden rounded-2xl border bg-card shadow-card hover:shadow-lg transition-all duration-300">
-                    <div className="grid grid-cols-1 md:grid-cols-2">
-                      <div className="aspect-video md:aspect-auto overflow-hidden relative min-h-[300px]">
-                        <img
-                          src={featuredPost.featured_image || "/src/assets/mustard-oil-product.jpg"}
-                          alt={featuredPost.title}
-                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
-                        />
-                      </div>
-                      <div className="p-8 flex flex-col justify-between">
-                        <div className="space-y-4">
-                          <div className="flex items-center gap-2">
-                            {featuredPost.category && (
-                              <Badge className="bg-primary/10 text-primary hover:bg-primary/20">
-                                {featuredPost.category.name}
-                              </Badge>
-                            )}
-                            <Badge variant="outline" className="border-accent text-accent">
-                              Featured Spotlight
+                    <div className="p-8 flex flex-col justify-between">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2">
+                          {featuredPost.category && (
+                            <Badge className="bg-primary/10 text-primary hover:bg-primary/20">
+                              {featuredPost.category.name}
                             </Badge>
-                          </div>
-                          
-                          <Link to={`/blog/${featuredPost.slug}`}>
-                            <h2 className="text-2xl sm:text-3xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
-                              {featuredPost.title}
-                            </h2>
-                          </Link>
-
-                          <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
-                            {featuredPost.excerpt}
-                          </p>
+                          )}
+                          <Badge variant="outline" className="border-accent text-accent">
+                            Featured Spotlight
+                          </Badge>
                         </div>
+                        
+                        <Link to={`/blog/${featuredPost.slug}`}>
+                          <h2 className="text-2xl sm:text-3xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
+                            {featuredPost.title}
+                          </h2>
+                        </Link>
 
-                        <div className="pt-6 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-foreground">{featuredPost.author?.name}</span>
-                            <span>•</span>
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {featuredPost.published_at ? new Date(featuredPost.published_at).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' }) : ""}
-                            </span>
-                          </div>
+                        <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
+                          {featuredPost.excerpt}
+                        </p>
+                      </div>
+
+                      <div className="pt-6 border-t border-border flex items-center justify-between text-xs text-muted-foreground mt-6">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground">{featuredPost.author?.name}</span>
+                          <span>•</span>
                           <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {featuredPost.reading_time} min read
+                            <Calendar className="h-3 w-3" />
+                            {featuredPost.published_at ? new Date(featuredPost.published_at).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' }) : ""}
                           </span>
                         </div>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {featuredPost.reading_time} min read
+                        </span>
                       </div>
                     </div>
                   </article>
@@ -333,13 +324,6 @@ export const BlogList = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {remainingPosts.map((post) => (
                     <article key={post.id} className="group flex flex-col bg-card border rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-300">
-                      <div className="aspect-video overflow-hidden bg-muted">
-                        <img
-                          src={post.featured_image || "/src/assets/mustard-oil-product.jpg"}
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
-                        />
-                      </div>
                       <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
