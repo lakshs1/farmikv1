@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import { useSeo } from "@/hooks/useSeo";
 import { useJsonLd } from "@/hooks/useJsonLd";
 
@@ -72,6 +73,7 @@ export const BlogDetail = () => {
             content,
             excerpt,
             featured_image,
+            category_id,
             published_at,
             reading_time,
             seo_title,
@@ -127,7 +129,7 @@ export const BlogDetail = () => {
         setPost(formattedPost);
 
         // Fetch Related Posts in same category
-        if (formattedPost.category) {
+        if (formattedPost.category && rawPost.category_id) {
           const { data: relData } = await supabase
             .from("blog_posts")
             .select(`
@@ -411,14 +413,7 @@ export const BlogDetail = () => {
           </div>
         </header>
 
-        {/* Featured Banner Image */}
-        <div className="aspect-video w-full rounded-2xl overflow-hidden mb-10 shadow-md">
-          <img
-            src={post.featured_image || "/src/assets/mustard-oil-product.jpg"}
-            alt={post.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {/* Featured Banner Image Removed */}
 
         {/* Content Layout split */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
@@ -543,9 +538,6 @@ export const BlogDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedPosts.map((rel) => (
                 <div key={rel.id} className="group bg-card rounded-lg overflow-hidden border hover:shadow-sm transition-shadow">
-                  <div className="aspect-video overflow-hidden">
-                    <img src={rel.featured_image || "/src/assets/mustard-oil-product.jpg"} alt={rel.title} className="w-full h-full object-cover" />
-                  </div>
                   <div className="p-4 space-y-2">
                     <Link to={`/blog/${rel.slug}`} className="hover:text-primary transition-colors font-bold text-sm text-foreground line-clamp-2 block leading-snug">
                       {rel.title}

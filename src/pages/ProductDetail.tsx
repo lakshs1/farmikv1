@@ -57,6 +57,11 @@ const ProductDetail = () => {
         .single();
 
       if (error) throw error;
+      
+      if (data) {
+        data.image_url = data.image_url ? data.image_url.trim().replace(/,$/, '') : '';
+      }
+      
       setProduct(data);
     } catch (error) {
       console.error('Error fetching product:', error);

@@ -48,7 +48,13 @@ const Products = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setProducts(data || []);
+      
+      const cleanedData = (data || []).map((product: any) => ({
+        ...product,
+        image_url: product.image_url ? product.image_url.trim().replace(/,$/, '') : ''
+      }));
+      
+      setProducts(cleanedData);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast({
