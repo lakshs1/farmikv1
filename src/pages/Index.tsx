@@ -1,208 +1,322 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Heart, Truck, Shield, Leaf, Award } from "lucide-react";
+import { useEffect, useRef } from "react";
 import farmikLogo from "@/assets/farmik-oils-logo.png";
 import mustardOilProduct from "@/assets/mustard-oil-product.jpg";
+import farmikProducts from "@/assets/farmik-products.jpg";
 
+/* ─── Scroll reveal hook ─────────────────────────────────────── */
+function useScrollReveal(rootMargin = "0px 0px -80px 0px") {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          obs.unobserve(el);
+        }
+      },
+      { rootMargin }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [rootMargin]);
+  return ref;
+}
+
+/* ─── Process step ───────────────────────────────────────────── */
+const steps = [
+  { n: "01", title: "Seed Selection", desc: "Hand-picked premium mustard seeds from organic farms across Punjab." },
+  { n: "02", title: "Cold Pressing", desc: "Traditional wooden gharats crush seeds slowly at ambient temperature." },
+  { n: "03", title: "Natural Filtration", desc: "Gravity filtration only — no bleaching, no deodorising agents." },
+  { n: "04", title: "Batch Testing", desc: "Every batch checked for purity, acidity, and nutritional integrity." },
+];
+
+const benefits = [
+  { title: "Rich in Omega-3 & Omega-6", desc: "A balanced fatty acid profile that supports cardiovascular health." },
+  { title: "Natural Antibacterial", desc: "Allyl isothiocyanate — mustard's natural compound — inhibits microbial growth." },
+  { title: "Vitamin E & Antioxidants", desc: "Preserves cells, supports skin, and slows oxidation in cooking." },
+  { title: "No Chemicals, Ever", desc: "Zero hexane, zero bleach, zero deodoriser. Just pressed seed and gravity." },
+];
+
+const testimonials = [
+  { name: "Priya Sharma", location: "Delhi", text: "The taste is exactly how I remember my grandmother's kitchen. Honest, sharp, real." },
+  { name: "Rajesh Kumar", location: "Mumbai", text: "You can tell the difference the moment you open the bottle. This is proper kachi ghani." },
+  { name: "Anita Singh", location: "Pune", text: "Switched from a supermarket brand two years ago. Haven't looked back since." },
+];
+
+/* ─── Index component ────────────────────────────────────────── */
 const Index = () => {
+  const heroRef = useRef<HTMLImageElement>(null);
+  const stepsRef = useScrollReveal();
+  const benefitsRef = useScrollReveal();
+  const testimonialsRef = useScrollReveal();
+  const ctaRef = useScrollReveal();
+
+  // Parallax on hero image
+  useEffect(() => {
+    const onScroll = () => {
+      if (heroRef.current) {
+        heroRef.current.style.transform = `translateY(${window.scrollY * 0.18}px)`;
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-background to-accent/10 py-20 mustard-wave">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/20 farm-hover">
-                Premium Cold-Pressed
-              </Badge>
-              <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 animate-float">
-                Pure <span className="text-primary">Mustard Oil</span> from Traditional Methods
-              </h1>
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                Experience the authentic taste and health benefits of traditional cold-pressed mustard oil. 
-                Rich in omega-3 fatty acids, antioxidants, and natural nutrients for your family's wellness.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/products">
-                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 farm-hover">
-                    <ShoppingCart className="mr-2 h-5 w-5" />
-                    Shop Now
-                  </Button>
-                </Link>
-                <Link to="/about">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto farm-hover">
-                    Learn More
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl p-8 farm-hover">
-                <img 
-                  src={mustardOilProduct} 
-                  alt="Premium Cold-Pressed Mustard Oil - Best Quality Healthy Oil"
-                  className="w-full h-auto max-w-md mx-auto rounded-2xl shadow-2xl farm-hover"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="min-h-screen page-enter">
 
-      {/* Features Section */}
-      <section className="py-16 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              Why Choose Farmik Oils?
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              We combine traditional cold-press methods with modern quality standards to deliver the purest mustard oil.
+      {/* ── Hero ─────────────────────────────────────────────── */}
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Background image with parallax */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <img
+            ref={heroRef}
+            src={farmikProducts}
+            alt="Farmik Oils — traditional cold press"
+            className="absolute inset-0 w-full h-[120%] object-cover"
+            style={{ top: "-10%", willChange: "transform" }}
+          />
+          {/* Warm overlay */}
+          <div className="absolute inset-0 bg-background/70" />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full pt-24 pb-16">
+          <div className="max-w-2xl">
+            <p
+              className="text-xs uppercase tracking-[0.18em] text-primary mb-6"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              Cold-Pressed · Traditional · Pure
             </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                icon: Leaf,
-                title: "100% Natural",
-                description: "Pure, unrefined mustard oil with no chemicals or additives"
-              },
-              {
-                icon: Award,
-                title: "Premium Quality",
-                description: "Traditional cold-press extraction preserves natural nutrients"
-              },
-              {
-                icon: Shield,
-                title: "Health Benefits",
-                description: "Rich in omega-3, antioxidants, and essential fatty acids"
-              },
-              {
-                icon: Truck,
-                title: "Fast Delivery",
-                description: "Quick and secure delivery to your doorstep nationwide"
-              }
-            ].map((feature, index) => (
-              <Card key={index} className="text-center border-0 shadow-card hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <feature.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Health Benefits Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-foreground mb-6">
-                Health Benefits of Cold-Pressed Mustard Oil
-              </h2>
-              <div className="space-y-4">
-                {[
-                  "Rich in Omega-3 and Omega-6 fatty acids for heart health",
-                  "Natural antibacterial and antifungal properties",
-                  "Boosts immunity and supports respiratory health",
-                  "Improves circulation and promotes healthy skin",
-                  "Contains vitamin E and natural antioxidants",
-                  "Supports digestive health and metabolism"
-                ].map((benefit, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <Heart className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <p className="text-muted-foreground">{benefit}</p>
-                  </div>
-                ))}
-              </div>
-              <Link to="/products" className="inline-block mt-6">
-                <Button className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90">
-                  Explore Our Products
-                </Button>
+            <h1
+              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
+              className="text-foreground mb-8"
+            >
+              Mustard Oil,<br />
+              <em>the way it's meant to be.</em>
+            </h1>
+            <p
+              className="text-muted-foreground text-lg leading-relaxed max-w-lg mb-10"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
+            >
+              Extracted without heat or chemicals using century-old wooden press methods.
+              The nutrients stay. The flavour stays. Nothing is lost.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link to="/products">
+                <button className="btn-primary">
+                  Shop Now
+                </button>
+              </Link>
+              <Link to="/about">
+                <button className="btn-minimal">
+                  Our Story
+                </button>
               </Link>
             </div>
-            <div className="relative">
-              <div className="bg-gradient-to-br from-accent/10 to-primary/10 rounded-3xl p-8">
-                <img 
-                  src={farmikLogo} 
-                  alt="Farmik Oils - Traditional Cold Press Methods"
-                  className="w-full h-auto max-w-md mx-auto"
-                />
-              </div>
-            </div>
           </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
+          <span
+            className="text-xs tracking-widest text-muted-foreground uppercase"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
+            Scroll
+          </span>
+          <div className="w-px h-10 bg-border animate-pulse" />
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-16 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              What Our Customers Say
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Join thousands of satisfied customers who trust Farmik Oils for their family's health.
+      {/* ── Process strip ─────────────────────────────────────── */}
+      <section className="py-24 border-y border-border bg-card">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <p
+              className="text-xs uppercase tracking-[0.18em] text-primary mb-3"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              The Process
             </p>
+            <h2
+              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
+              className="text-foreground"
+            >
+              From field to bottle
+            </h2>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                name: "Priya Sharma",
-                location: "Delhi",
-                review: "The best mustard oil I've ever used! Pure, authentic taste and amazing quality. My family loves it."
-              },
-              {
-                name: "Rajesh Kumar",
-                location: "Mumbai",
-                review: "Farmik Oils has become our go-to choice. The cold-press method really makes a difference in taste and health benefits."
-              },
-              {
-                name: "Anita Singh",
-                location: "Pune",
-                review: "Excellent quality and fast delivery. The oil is pure and you can taste the authenticity. Highly recommended!"
-              }
-            ].map((testimonial, index) => (
-              <Card key={index} className="border-0 shadow-card">
-                <CardContent className="p-6">
-                  <div className="text-primary text-4xl mb-4">"</div>
-                  <p className="text-muted-foreground mb-4 italic">{testimonial.review}</p>
-                  <div className="flex items-center space-x-2">
-                    <div>
-                      <p className="font-semibold text-foreground">{testimonial.name}</p>
-                      <p className="text-sm text-muted-foreground">{testimonial.location}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+
+          <div ref={stepsRef} className="reveal-children grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {steps.map((step) => (
+              <div key={step.n} className="group">
+                <p
+                  className="text-4xl text-primary/20 mb-4 transition-colors duration-300 group-hover:text-primary/50"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
+                >
+                  {step.n}
+                </p>
+                <div className="w-8 h-px bg-border mb-4 transition-all duration-300 group-hover:w-16 group-hover:bg-primary" />
+                <h3
+                  className="mb-2 text-foreground"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500, fontSize: "1.1rem" }}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  className="text-sm text-muted-foreground leading-relaxed"
+                  style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
+                >
+                  {step.desc}
+                </p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-primary to-primary-glow">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Experience Pure, Healthy Mustard Oil?
-          </h2>
-          <p className="text-xl text-white/90 mb-8">
-            Order now and enjoy the authentic taste of traditional cold-pressed mustard oil delivered to your home.
+      {/* ── Why Farmik ────────────────────────────────────────── */}
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+            <div>
+              <p
+                className="text-xs uppercase tracking-[0.18em] text-primary mb-4"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                Why It Matters
+              </p>
+              <h2
+                style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
+                className="text-foreground mb-6"
+              >
+                What stays in the oil<br />
+                <em>depends on how you press it.</em>
+              </h2>
+              <p
+                className="text-muted-foreground leading-relaxed mb-8"
+                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
+              >
+                Industrial refining uses hexane solvents and high heat — stripping out colour, smell,
+                and most of the beneficial compounds. Our cold-press method uses slow mechanical pressure
+                at ambient temperatures. Nothing is removed except the husk.
+              </p>
+              <Link to="/about">
+                <button className="btn-minimal text-xs">
+                  Read the Full Story
+                </button>
+              </Link>
+            </div>
+
+            <div ref={benefitsRef} className="reveal-children grid grid-cols-1 sm:grid-cols-2 gap-px bg-border">
+              {benefits.map((b) => (
+                <div
+                  key={b.title}
+                  className="bg-background p-6 group hover:bg-card transition-colors duration-300"
+                >
+                  <h3
+                    className="text-foreground mb-2"
+                    style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500, fontSize: "1.05rem" }}
+                  >
+                    {b.title}
+                  </h3>
+                  <p
+                    className="text-xs text-muted-foreground leading-relaxed"
+                    style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
+                  >
+                    {b.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Product image break ────────────────────────────────── */}
+      <section className="py-16 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="relative aspect-[16/6] overflow-hidden">
+            <img
+              src={mustardOilProduct}
+              alt="Farmik cold-pressed mustard oil"
+              className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-foreground/10" />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials ─────────────────────────────────────── */}
+      <section className="py-24 bg-card border-y border-border">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <p
+              className="text-xs uppercase tracking-[0.18em] text-primary mb-3"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              Reviews
+            </p>
+            <h2
+              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
+              className="text-foreground"
+            >
+              What customers say
+            </h2>
+          </div>
+
+          <div ref={testimonialsRef} className="reveal-children grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
+            {testimonials.map((t) => (
+              <div key={t.name} className="bg-card p-8 hover:bg-background transition-colors duration-300">
+                <p
+                  className="text-foreground leading-relaxed mb-8 italic"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, fontSize: "1.1rem" }}
+                >
+                  "{t.text}"
+                </p>
+                <div>
+                  <p
+                    className="text-sm font-medium text-foreground"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    {t.name}
+                  </p>
+                  <p
+                    className="text-xs text-muted-foreground mt-1"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    {t.location}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA band ─────────────────────────────────────────── */}
+      <section ref={ctaRef} className="reveal py-32 text-center">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <p
+            className="text-xs uppercase tracking-[0.18em] text-primary mb-4"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
+            Pure. Traditional. Farmik.
           </p>
+          <h2
+            style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
+            className="text-foreground mb-8"
+          >
+            Bring honest oil<br />
+            <em>back to your kitchen.</em>
+          </h2>
           <Link to="/products">
-            <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-white/90">
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              Shop Premium Oils
-            </Button>
+            <button className="btn-primary">
+              Explore Products
+            </button>
           </Link>
         </div>
       </section>

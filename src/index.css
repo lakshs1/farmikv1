@@ -2,259 +2,353 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Design System ─────────────────────────────────────────────────────── */
 @layer base {
   :root {
-    /* Farm Theme Colors - Yellow & Green */
-    --primary: 45 95% 50%; /* Bright mustard yellow */
-    --primary-foreground: 45 15% 15%; /* Dark for contrast */
-    --primary-glow: 45 100% 65%; /* Lighter mustard glow */
-    
-    --secondary: 120 40% 25%; /* Deep forest green */
-    --secondary-foreground: 0 0% 98%; /* Light text */
-    
-    --accent: 85 60% 45%; /* Olive green */
-    --accent-foreground: 0 0% 98%;
-    
-    --muted: 45 40% 95%; /* Warm cream */
-    --muted-foreground: 45 15% 40%; /* Muted text */
-    
-    --background: 45 60% 98%; /* Warm white background */
-    --foreground: 45 15% 15%; /* Dark warm text */
-    
-    --card: 0 0% 100%;
-    --card-foreground: 45 15% 15%;
-    
-    --popover: 0 0% 100%;
-    --popover-foreground: 45 15% 15%;
-    
-    --border: 45 30% 85%; /* Warm border */
-    --input: 45 30% 90%;
-    --ring: 45 95% 50%; /* Yellow focus ring */
-    
-    /* State Colors with Farm Theme */
-    --destructive: 0 84% 60%;
+    /* Earthy neutral palette */
+    --background:       40 20% 97%;     /* warm parchment */
+    --foreground:       30 10% 15%;     /* warm charcoal */
+
+    --card:             40 15% 94%;
+    --card-foreground:  30 10% 15%;
+
+    --popover:          40 15% 94%;
+    --popover-foreground: 30 10% 15%;
+
+    /* Primary: burnished amber-brown (aged mustard, not bright yellow) */
+    --primary:          35 55% 40%;
+    --primary-foreground: 40 20% 97%;
+
+    /* Secondary: stone grey */
+    --secondary:        30 8% 55%;
+    --secondary-foreground: 30 10% 15%;
+
+    /* Muted: warm stone surface */
+    --muted:            40 12% 90%;
+    --muted-foreground: 30 8% 48%;
+
+    /* Accent: same as primary for consistency */
+    --accent:           35 40% 88%;
+    --accent-foreground: 30 10% 15%;
+
+    --destructive:      0 65% 48%;
     --destructive-foreground: 0 0% 98%;
-    
-    --warning: 45 95% 50%; /* Yellow warning */
-    --warning-foreground: 45 15% 15%;
-    
-    --success: 120 40% 35%; /* Green success */
-    --success-foreground: 0 0% 98%;
-    
-    /* Farm-themed Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--accent) / 0.1));
-    --gradient-farm: linear-gradient(45deg, hsl(45 95% 50% / 0.1), hsl(120 40% 25% / 0.1));
-    --gradient-field: linear-gradient(180deg, hsl(85 60% 45% / 0.2), hsl(45 95% 50% / 0.1));
-    
-    /* Enhanced Shadows */
-    --shadow-warm: 0 10px 30px -10px hsl(var(--primary) / 0.3);
-    --shadow-card: 0 4px 20px -5px hsl(var(--primary) / 0.15);
-    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.2);
-    
-    /* Animation Variables */
-    --wave-duration: 3s;
-    --hover-scale: 1.02;
-    
-    --radius: 0.75rem;
+
+    --border:           35 15% 84%;
+    --input:            35 12% 88%;
+    --ring:             35 55% 40%;
+
+    --radius:           0.375rem;
+
+    /* Custom tokens */
+    --shadow-sm:  0 1px 3px hsl(30 15% 15% / 0.06);
+    --shadow-md:  0 4px 16px hsl(30 15% 15% / 0.09);
+    --shadow-lg:  0 8px 32px hsl(30 15% 15% / 0.12);
+    --shadow-xl:  0 16px 48px hsl(30 15% 15% / 0.14);
+
+    /* Sidebar (kept for shadcn compatibility) */
+    --sidebar-background:         40 15% 94%;
+    --sidebar-foreground:         30 10% 20%;
+    --sidebar-primary:            35 55% 40%;
+    --sidebar-primary-foreground: 40 20% 97%;
+    --sidebar-accent:             40 12% 90%;
+    --sidebar-accent-foreground:  30 10% 15%;
+    --sidebar-border:             35 15% 84%;
+    --sidebar-ring:               35 55% 40%;
   }
 
   .dark {
-    --background: 45 15% 8%; /* Dark farm theme */
-    --foreground: 45 20% 95%;
-    --card: 45 15% 10%;
-    --card-foreground: 45 20% 95%;
-    --popover: 45 15% 10%;
-    --popover-foreground: 45 20% 95%;
-    --primary: 45 95% 60%; /* Brighter yellow in dark */
-    --primary-foreground: 45 15% 8%;
-    --secondary: 120 40% 35%; /* Adjusted green for dark */
-    --secondary-foreground: 0 0% 95%;
-    --muted: 45 15% 15%;
-    --muted-foreground: 45 10% 65%;
-    --accent: 85 50% 55%; /* Lighter olive for dark */
-    --accent-foreground: 45 15% 8%;
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 95%;
-    --border: 45 15% 20%;
-    --input: 45 15% 20%;
-    --ring: 45 95% 60%;
+    --background:       30 12% 10%;
+    --foreground:       40 15% 92%;
+    --card:             30 12% 13%;
+    --card-foreground:  40 15% 92%;
+    --popover:          30 12% 13%;
+    --popover-foreground: 40 15% 92%;
+    --primary:          35 50% 55%;
+    --primary-foreground: 30 12% 10%;
+    --secondary:        30 8% 35%;
+    --secondary-foreground: 40 15% 92%;
+    --muted:            30 10% 18%;
+    --muted-foreground: 30 8% 58%;
+    --accent:           30 10% 18%;
+    --accent-foreground: 40 15% 92%;
+    --destructive:      0 55% 42%;
+    --destructive-foreground: 0 0% 98%;
+    --border:           30 10% 22%;
+    --input:            30 10% 22%;
+    --ring:             35 50% 55%;
+    --sidebar-background: 30 12% 10%;
+    --sidebar-foreground: 40 15% 92%;
+    --sidebar-primary:    35 50% 55%;
+    --sidebar-primary-foreground: 30 12% 10%;
+    --sidebar-accent:     30 10% 18%;
+    --sidebar-accent-foreground: 40 15% 92%;
+    --sidebar-border:     30 10% 22%;
+    --sidebar-ring:       35 50% 55%;
   }
 }
 
+/* ─── Base Styles ────────────────────────────────────────────────────────── */
 @layer base {
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground font-sans;
-  }
-  h1 {
-    @apply text-3xl font-bold text-foreground;
-  }
-}
 
-/* Farm Theme Animations and Effects */
-@layer components {
-  .mustard-wave {
-    background: linear-gradient(
-      45deg,
-      hsl(var(--primary) / 0.1) 0%,
-      hsl(var(--accent) / 0.1) 25%,
-      hsl(var(--primary) / 0.2) 50%,
-      hsl(var(--accent) / 0.1) 75%,
-      hsl(var(--primary) / 0.1) 100%
-    );
-    background-size: 400% 400%;
-    animation: wave-flow var(--wave-duration) ease-in-out infinite;
-  }
-  
-  .farm-hover {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .farm-hover:hover {
-    transform: scale(var(--hover-scale));
-    box-shadow: var(--shadow-glow);
-  }
-  
-  .active-page {
-    position: relative;
-  }
-  
-  .active-page::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: hsl(var(--primary));
-    border-radius: 2px;
-    animation: glow-pulse 2s ease-in-out infinite;
-  }
-  
-  .flower-rating {
-    filter: hue-rotate(45deg) saturate(1.2);
-  }
-}
-
-@keyframes wave-flow {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    box-shadow: 0 0 5px hsl(var(--primary) / 0.5);
-  }
-  50% {
-    box-shadow: 0 0 15px hsl(var(--primary) / 0.8);
-  }
-}
-
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  h1 { font-size: clamp(2.2rem, 5vw, 4rem); }
+  h2 { font-size: clamp(1.7rem, 3.5vw, 2.8rem); }
+  h3 { font-size: clamp(1.2rem, 2.5vw, 1.6rem); }
+}
+
+/* ─── Scroll Reveal ─────────────────────────────────────────────────────── */
+@layer components {
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* Stagger children */
+  .reveal-children > * {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal-children.is-visible > *:nth-child(1) { opacity: 1; transform: none; transition-delay: 0s; }
+  .reveal-children.is-visible > *:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.1s; }
+  .reveal-children.is-visible > *:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.2s; }
+  .reveal-children.is-visible > *:nth-child(4) { opacity: 1; transform: none; transition-delay: 0.3s; }
+
+  /* Fade-in on mount */
+  .page-enter {
+    animation: fadeInUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Hover lift */
+  .hover-lift {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* Underline draw animation for nav links */
+  .nav-link {
+    position: relative;
+    padding-bottom: 2px;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: hsl(var(--primary));
+    transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    width: 100%;
+  }
+
+  /* Floating label inputs */
+  .float-field {
+    position: relative;
+  }
+
+  .float-field input,
+  .float-field textarea {
+    @apply w-full bg-transparent border-b border-border rounded-none px-0 py-3 text-foreground;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.25s ease;
+  }
+
+  .float-field input:focus,
+  .float-field textarea:focus {
+    border-color: hsl(var(--primary));
+  }
+
+  .float-field label {
+    position: absolute;
+    top: 0.75rem;
+    left: 0;
+    font-size: 0.9rem;
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+    transition: transform 0.25s ease, font-size 0.25s ease, color 0.25s ease;
+    transform-origin: left top;
+  }
+
+  .float-field input:focus ~ label,
+  .float-field input:not(:placeholder-shown) ~ label,
+  .float-field textarea:focus ~ label,
+  .float-field textarea:not(:placeholder-shown) ~ label {
+    transform: translateY(-1.25rem) scale(0.78);
+    color: hsl(var(--primary));
+  }
+
+  /* Product card hover reveal */
+  .product-card .cart-action {
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .product-card:hover .cart-action {
+    transform: translateY(0);
+  }
+
+  .product-card .card-img {
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .product-card:hover .card-img {
+    transform: scale(1.04);
+  }
+
+  /* Accordion */
+  .accordion-content {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  .accordion-content.open {
+    max-height: 400px;
+    opacity: 1;
+  }
+
+  /* Minimal button */
+  .btn-minimal {
+    @apply inline-flex items-center gap-2 border border-foreground text-foreground px-6 py-3 text-sm tracking-wide;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: transparent;
+    transition: background 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+  }
+
+  .btn-minimal:hover {
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 text-sm tracking-wide;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+    border: 1px solid hsl(var(--foreground));
+    transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover {
+    background: hsl(var(--primary));
+    border-color: hsl(var(--primary));
+    transform: translateY(-1px);
+  }
+
+  /* Thin divider */
+  .divider {
+    @apply w-12 h-px bg-primary mx-0 my-6;
+  }
+
+  .divider-center {
+    @apply w-12 h-px bg-primary mx-auto my-6;
+  }
+}
+
+/* ─── Keyframes ──────────────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+/* Kept for shadcn accordion compatibility */
+@keyframes accordion-down {
+  from { height: 0; }
+  to   { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to   { height: 0; }
 }

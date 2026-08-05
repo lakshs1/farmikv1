@@ -297,7 +297,7 @@ const handlePaymentFailure = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pt-20">
+      <div className="min-h-screen bg-background pt-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
@@ -309,7 +309,7 @@ const handlePaymentFailure = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-24">
       {/* Header */}
       <section className="bg-gradient-to-r from-primary/10 to-accent/10 py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

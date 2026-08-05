@@ -1,98 +1,132 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Instagram, Youtube } from "lucide-react";
 import farmikLogo from "@/assets/farmik-oils-logo.png";
 
 export const Footer = () => {
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="bg-muted border-t border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <img 
-                src={farmikLogo} 
-                alt="Farmik Oils Logo" 
-                className="h-10 w-auto"
-              />
-              <span className="font-bold text-xl text-primary">Farmik Oils</span>
-            </div>
-            <p className="text-muted-foreground mb-4 max-w-md">
-              Premium cold-pressed mustard oil, traditionally extracted to preserve natural nutrients and authentic taste. 
-              Pure, healthy, and rich in omega-3 fatty acids.
+    <footer className="bg-muted border-t border-border mt-24">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+
+          {/* Brand */}
+          <div className="md:col-span-5">
+            <Link to="/" className="inline-flex items-center gap-3 mb-6">
+              <img src={farmikLogo} alt="Farmik Oils" className="h-8 w-auto" />
+              <span
+                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                className="text-xl font-medium text-foreground"
+              >
+                Farmik Oils
+              </span>
+            </Link>
+            <p
+              className="text-sm text-muted-foreground max-w-sm leading-relaxed mb-8"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              Cold-pressed the traditional way. Pure mustard oil extracted without heat or chemicals —
+              preserving every nutrient, every drop of authentic flavour.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Facebook className="h-5 w-5" />
+            <div className="flex items-center gap-5">
+              <a
+                href="#"
+                aria-label="Facebook"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Facebook className="h-4 w-4" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Instagram className="h-5 w-5" />
+              <a
+                href="#"
+                aria-label="Instagram"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Instagram className="h-4 w-4" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Twitter className="h-5 w-5" />
+              <a
+                href="#"
+                aria-label="YouTube"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Youtube className="h-4 w-4" />
               </a>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/" className="text-muted-foreground hover:text-primary transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link to="/products" className="text-muted-foreground hover:text-primary transition-colors">
-                  Products
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors">
-                  Blog
-                </Link>
-              </li>
+          {/* Spacer */}
+          <div className="hidden md:block md:col-span-1" />
+
+          {/* Pages */}
+          <div className="md:col-span-2">
+            <h4
+              className="text-xs uppercase tracking-widest text-foreground/50 mb-5"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              Pages
+            </h4>
+            <ul className="space-y-3">
+              {[
+                { label: "Home", to: "/" },
+                { label: "Products", to: "/products" },
+                { label: "About", to: "/about" },
+                { label: "Blog", to: "/blog" },
+                { label: "Contact", to: "/contact" },
+              ].map((link) => (
+                <li key={link.to}>
+                  <Link
+                    to={link.to}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Contact Info */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">Contact Info</h3>
-            <ul className="space-y-2">
-              <li className="flex items-center space-x-2 text-muted-foreground">
-                <Phone className="h-4 w-4" />
-                <span>+91 98765 43210</span>
+          {/* Contact */}
+          <div className="md:col-span-4">
+            <h4
+              className="text-xs uppercase tracking-widest text-foreground/50 mb-5"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              Contact
+            </h4>
+            <ul className="space-y-3 text-sm text-muted-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <li>
+                <a href="mailto:care@myfarmik.com" className="hover:text-foreground transition-colors">
+                  care@myfarmik.com
+                </a>
               </li>
-              <li className="flex items-center space-x-2 text-muted-foreground">
-                <Mail className="h-4 w-4" />
-                <span>info@farmikoils.com</span>
+              <li>
+                <a href="tel:+919876543210" className="hover:text-foreground transition-colors">
+                  +91 98765 43210
+                </a>
               </li>
-              <li className="flex items-start space-x-2 text-muted-foreground">
-                <MapPin className="h-4 w-4 mt-1" />
-                <span>123 Traditional Oil Mill<br />Mustard Fields, Punjab, India</span>
+              <li className="text-muted-foreground/80 leading-relaxed">
+                123 Traditional Oil Mill<br />
+                Mustard Fields, Punjab, India
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-border mt-8 pt-8 text-center">
-          <p className="text-muted-foreground">
-            © 2024 Farmik Oils. All rights reserved. | Premium Cold-Pressed Mustard Oil | Best Quality Healthy Oils
+        {/* Bottom bar */}
+        <div className="border-t border-border mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p
+            className="text-xs text-muted-foreground"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
+            © {year} Farmik Oils. All rights reserved.
           </p>
-          <p className="text-sm text-muted-foreground mt-2">
-            Keywords: best cold press oil, mustard oil, cold press mustard oils, farmik oils
-          </p>
+          <div
+            className="flex items-center gap-6 text-xs text-muted-foreground"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
+            <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-foreground transition-colors">Terms</a>
+          </div>
         </div>
       </div>
     </footer>

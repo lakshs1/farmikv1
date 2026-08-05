@@ -351,7 +351,7 @@ export const BlogDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 pt-24">
       {/* Navigation Header */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         <Button variant="ghost" onClick={() => navigate("/blog")} className="mb-6 rounded-full hover:bg-muted">

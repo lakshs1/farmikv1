@@ -1,236 +1,287 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { ShoppingCart, User, X, Search, Menu } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import farmikLogo from "@/assets/farmik-oils-logo.png";
 
 export const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
   const { user, signOut } = useAuth();
   const { items } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isActivePage = (path: string) => location.pathname === path;
+  const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
+
+  const isActive = (path: string) =>
+    path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Focus search input when opened
+  useEffect(() => {
+    if (searchOpen) {
+      setTimeout(() => searchRef.current?.focus(), 80);
+    }
+  }, [searchOpen]);
+
+  // Close drawer on route change
+  useEffect(() => {
+    setDrawerOpen(false);
+    setSearchOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll when drawer open
+  useEffect(() => {
+    document.body.style.overflow = drawerOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [drawerOpen]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setSearchOpen(false);
     }
   };
 
-  const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
+  const navLinks = [
+    { label: "Home", to: "/" },
+    { label: "Products", to: "/products" },
+    { label: "About", to: "/about" },
+    { label: "Blog", to: "/blog" },
+    { label: "Contact", to: "/contact" },
+  ];
 
   return (
-    <header className="bg-background border-b border-border sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img 
-              src={farmikLogo} 
-              alt="Farmik Oils - Premium Cold-Pressed Mustard Oil" 
-              className="h-10 w-auto"
-            />
-            <span className="font-bold text-xl text-primary">Farmik Oils</span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/" 
-              className={`text-foreground hover:text-primary transition-colors farm-hover ${
-                isActivePage('/') ? 'active-page' : ''
-              }`}
-            >
-              Home
-            </Link>
-            <Link 
-              to="/products" 
-              className={`text-foreground hover:text-primary transition-colors farm-hover ${
-                isActivePage('/products') ? 'active-page' : ''
-              }`}
-            >
-              Products
-            </Link>
-            <Link 
-              to="/about" 
-              className={`text-foreground hover:text-primary transition-colors farm-hover ${
-                isActivePage('/about') ? 'active-page' : ''
-              }`}
-            >
-              About Us
-            </Link>
-            <Link 
-              to="/contact" 
-              className={`text-foreground hover:text-primary transition-colors farm-hover ${
-                isActivePage('/contact') ? 'active-page' : ''
-              }`}
-            >
-              Contact
-            </Link>
-            <Link 
-              to="/blog" 
-              className={`text-foreground hover:text-primary transition-colors farm-hover ${
-                isActivePage('/blog') || location.pathname.startsWith('/blog') ? 'active-page' : ''
-              }`}
-            >
-              Blog
-            </Link>
-          </nav>
-
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="hidden md:flex items-center space-x-2 flex-1 max-w-md mx-8">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+    <>
+      <header
+        style={{
+          transition: "background 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease, height 0.4s ease",
+        }}
+        className={`fixed top-0 left-0 right-0 z-50 ${
+          scrolled
+            ? "bg-background/90 backdrop-blur-md shadow-[0_1px_0_hsl(var(--border))]"
+            : "bg-transparent"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div
+            className={`flex items-center justify-between transition-all duration-400 ${
+              scrolled ? "h-[60px]" : "h-[80px]"
+            }`}
+          >
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3 shrink-0">
+              <img
+                src={farmikLogo}
+                alt="Farmik Oils"
+                className="h-8 w-auto"
               />
-            </div>
-            <Button type="submit" size="sm" variant="outline">
-              Search
-            </Button>
-          </form>
+              <span
+                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                className="text-xl font-medium tracking-wide text-foreground hidden sm:block"
+              >
+                Farmik
+              </span>
+            </Link>
 
-          {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
-            {/* Cart */}
-            <Link to="/cart" className="relative">
-              <Button variant="outline" size="icon">
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex items-center gap-8">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`nav-link text-sm text-foreground/80 hover:text-foreground transition-colors ${
+                    isActive(link.to) ? "active text-foreground" : ""
+                  }`}
+                  style={{ fontFamily: "'Inter', sans-serif", letterSpacing: "0.03em" }}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+
+            {/* Right actions */}
+            <div className="flex items-center gap-3">
+              {/* Search toggle */}
+              <button
+                onClick={() => setSearchOpen(!searchOpen)}
+                aria-label="Search"
+                className="p-2 text-foreground/70 hover:text-foreground transition-colors"
+              >
+                <Search className="h-4 w-4" />
+              </button>
+
+              {/* Cart */}
+              <Link to="/cart" className="relative p-2 text-foreground/70 hover:text-foreground transition-colors">
                 <ShoppingCart className="h-4 w-4" />
                 {cartItemCount > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs">
-                    {cartItemCount}
-                  </Badge>
+                  <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary block" />
                 )}
-              </Button>
-            </Link>
+              </Link>
 
-            {/* User Account */}
-            {user ? (
-              <div className="hidden md:flex items-center space-x-2">
-                <Link to="/profile">
-                  <Button variant="outline" size="icon">
+              {/* User (desktop) */}
+              {user ? (
+                <div className="hidden md:flex items-center gap-3">
+                  <Link to="/profile" className="p-2 text-foreground/70 hover:text-foreground transition-colors">
                     <User className="h-4 w-4" />
-                  </Button>
+                  </Link>
+                  <button
+                    onClick={signOut}
+                    className="text-sm text-foreground/60 hover:text-foreground transition-colors"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="hidden md:block text-sm text-foreground/60 hover:text-foreground transition-colors"
+                  style={{ fontFamily: "'Inter', sans-serif" }}
+                >
+                  Sign In
                 </Link>
-                <Button variant="outline" onClick={signOut}>
-                  Sign Out
-                </Button>
-              </div>
-            ) : (
-              <div className="hidden md:flex items-center space-x-2">
-                <Link to="/auth">
-                  <Button variant="outline">Sign In</Button>
-                </Link>
-              </div>
-            )}
+              )}
 
-            {/* Mobile Menu Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-            </Button>
+              {/* Hamburger (mobile) */}
+              <button
+                className="md:hidden p-2 text-foreground/70 hover:text-foreground transition-colors"
+                onClick={() => setDrawerOpen(true)}
+                aria-label="Open menu"
+              >
+                <Menu className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
-            <nav className="flex flex-col space-y-4">
-              <Link 
-                to="/" 
-                className="text-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Home
-              </Link>
-              <Link 
-                to="/products" 
-                className="text-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Products
-              </Link>
-              <Link 
-                to="/about" 
-                className="text-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                About Us
-              </Link>
-              <Link 
-                to="/contact" 
-                className="text-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Contact
-              </Link>
-              <Link 
-                to="/blog" 
-                className="text-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Blog
-              </Link>
-              
-              {/* Mobile Search */}
-              <form onSubmit={handleSearch} className="flex items-center space-x-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    type="search"
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Button type="submit" size="sm">
-                  Search
-                </Button>
-              </form>
+        {/* Search bar — slides down */}
+        <div
+          style={{
+            maxHeight: searchOpen ? "72px" : "0",
+            overflow: "hidden",
+            transition: "max-height 0.35s cubic-bezier(0.22,1,0.36,1)",
+            borderTop: searchOpen ? "1px solid hsl(var(--border))" : "none",
+          }}
+          className="bg-background/95 backdrop-blur-md"
+        >
+          <form onSubmit={handleSearch} className="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex items-center gap-4">
+            <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+            <input
+              ref={searchRef}
+              type="search"
+              placeholder="Search products…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none border-none"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            />
+            <button
+              type="button"
+              onClick={() => setSearchOpen(false)}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </form>
+        </div>
+      </header>
 
-              {/* Mobile User Actions */}
-              {user ? (
-                <div className="flex flex-col space-y-2 pt-4 border-t border-border">
-                  <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full justify-start">
-                      <User className="h-4 w-4 mr-2" />
-                      Profile
-                    </Button>
-                  </Link>
-                  <Button variant="outline" onClick={signOut} className="w-full">
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
-                <div className="pt-4 border-t border-border">
-                  <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">
-                      Sign In
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </nav>
-          </div>
-        )}
-      </div>
-    </header>
+      {/* Mobile Drawer */}
+      {/* Overlay */}
+      <div
+        onClick={() => setDrawerOpen(false)}
+        className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm md:hidden"
+        style={{
+          opacity: drawerOpen ? 1 : 0,
+          pointerEvents: drawerOpen ? "auto" : "none",
+          transition: "opacity 0.3s ease",
+        }}
+      />
+
+      {/* Drawer panel */}
+      <aside
+        className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-background flex flex-col md:hidden"
+        style={{
+          transform: drawerOpen ? "translateX(0)" : "translateX(100%)",
+          transition: "transform 0.4s cubic-bezier(0.22,1,0.36,1)",
+          boxShadow: "-8px 0 32px hsl(30 15% 15% / 0.12)",
+        }}
+      >
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+          <span
+            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            className="text-lg font-medium"
+          >
+            Farmik
+          </span>
+          <button
+            onClick={() => setDrawerOpen(false)}
+            className="p-2 text-foreground/70 hover:text-foreground transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-6 py-8 flex flex-col gap-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`py-3 text-base border-b border-border/50 text-foreground/70 hover:text-foreground transition-colors ${
+                isActive(link.to) ? "text-foreground font-medium" : ""
+              }`}
+              style={{ fontFamily: "'Inter', sans-serif" }}
+              onClick={() => setDrawerOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="px-6 py-6 border-t border-border">
+          {user ? (
+            <div className="flex flex-col gap-3">
+              <Link
+                to="/profile"
+                onClick={() => setDrawerOpen(false)}
+                className="flex items-center gap-2 text-sm text-foreground/70 hover:text-foreground transition-colors"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                <User className="h-4 w-4" /> Profile
+              </Link>
+              <button
+                onClick={() => { signOut(); setDrawerOpen(false); }}
+                className="text-left text-sm text-foreground/60 hover:text-foreground transition-colors"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/auth"
+              onClick={() => setDrawerOpen(false)}
+              className="block text-sm text-foreground/70 hover:text-foreground transition-colors"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              Sign In
+            </Link>
+          )}
+        </div>
+      </aside>
+    </>
   );
 };

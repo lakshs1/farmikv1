@@ -1,10 +1,6 @@
-import { useState, useEffect } from "react";
-import { Search, Filter, ShoppingCart, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState, useEffect, useRef } from "react";
+import { Search, SlidersHorizontal, ShoppingCart, Link as LinkIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
 import { useSearchParams } from "react-router-dom";
@@ -21,225 +17,270 @@ interface Product {
   is_active: boolean;
 }
 
+const SORT_OPTIONS = [
+  { label: "Name A–Z", value: "name" },
+  { label: "Price: Low", value: "price-low" },
+  { label: "Price: High", value: "price-high" },
+];
+
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
+  const [sortOpen, setSortOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const { addToCart } = useCart();
+  const titleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchProducts();
-    // Set search query from URL params
-    const urlSearch = searchParams.get('search');
-    if (urlSearch) {
-      setSearchQuery(urlSearch);
-    }
+    const urlSearch = searchParams.get("search");
+    if (urlSearch) setSearchQuery(urlSearch);
   }, [searchParams]);
+
+  // Reveal title
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { el.classList.add("is-visible"); obs.unobserve(el); }
+    }, { rootMargin: "0px 0px -60px 0px" });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
+        .from("products")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
       if (error) throw error;
       setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load products",
-        variant: "destructive",
-      });
+    } catch {
+      toast({ title: "Error", description: "Failed to load products", variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const filtered = products.filter(
+    (p) =>
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-low':
-        return a.price - b.price;
-      case 'price-high':
-        return b.price - a.price;
-      case 'name':
-      default:
-        return a.name.localeCompare(b.name);
-    }
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === "price-low") return a.price - b.price;
+    if (sortBy === "price-high") return b.price - a.price;
+    return a.name.localeCompare(b.name);
   });
 
-  const handleAddToCart = async (productId: string) => {
-    await addToCart(productId, 1);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background pt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Loading products...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleAddToCart = (productId: string) => addToCart(productId, 1);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <section className="bg-gradient-to-r from-primary/10 to-accent/10 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-foreground mb-4">
-              Premium Cold-Pressed Mustard Oil Products
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Discover our range of pure, unrefined mustard oils extracted using traditional cold-press methods. 
-              Rich in nutrients and authentic taste.
+    <div className="min-h-screen bg-background page-enter pt-24">
+
+      {/* ── Page header ───────────────────────────────────── */}
+      <div ref={titleRef} className="reveal max-w-7xl mx-auto px-6 lg:px-8 pt-12 pb-10 border-b border-border">
+        <p
+          className="text-xs uppercase tracking-[0.18em] text-primary mb-3"
+          style={{ fontFamily: "'Inter', sans-serif" }}
+        >
+          Our Range
+        </p>
+        <h1
+          style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
+          className="text-foreground"
+        >
+          Cold-Pressed Oils
+        </h1>
+        <p
+          className="mt-4 text-muted-foreground max-w-xl"
+          style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
+        >
+          Pressed at ambient temperature. No heat. No solvents. Just oil as it should be.
+        </p>
+      </div>
+
+      {/* ── Filters bar ───────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6 flex flex-wrap items-center gap-4 border-b border-border">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="absolute left-0 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <input
+            type="search"
+            placeholder="Search…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-transparent border-b border-border pl-6 pr-2 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          />
+        </div>
+
+        <div className="flex items-center gap-4 ml-auto">
+          {/* Sort */}
+          <div className="relative">
+            <button
+              onClick={() => setSortOpen(!sortOpen)}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              {SORT_OPTIONS.find((o) => o.value === sortBy)?.label}
+            </button>
+            {sortOpen && (
+              <div
+                className="absolute right-0 top-full mt-2 bg-card border border-border shadow-md z-20 py-1"
+                style={{ minWidth: "140px" }}
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => { setSortBy(opt.value); setSortOpen(false); }}
+                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors ${
+                      sortBy === opt.value ? "text-primary" : "text-foreground"
+                    }`}
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Count */}
+          <span
+            className="text-xs text-muted-foreground"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
+            {sorted.length} {sorted.length === 1 ? "product" : "products"}
+          </span>
+        </div>
+      </div>
+
+      {/* ── Products grid ─────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-px bg-border">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-card aspect-[3/4] animate-pulse" />
+            ))}
+          </div>
+        ) : sorted.length === 0 ? (
+          <div className="py-24 text-center">
+            <p
+              className="text-muted-foreground"
+              style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.4rem", fontWeight: 300 }}
+            >
+              No products match your search.
             </p>
           </div>
-        </div>
-      </section>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-px bg-border">
+            {sorted.map((product) => (
+              <div
+                key={product.id}
+                className="product-card bg-background group relative overflow-hidden"
+              >
+                {/* Image */}
+                <div className="aspect-[3/4] overflow-hidden bg-card">
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="card-img w-full h-full object-cover"
+                  />
+                </div>
 
-      {/* Filters */}
-      <section className="py-8 border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            {/* Sort */}
-            <div className="flex items-center space-x-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="name">Name</SelectItem>
-                  <SelectItem value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem value="price-high">Price: High to Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Products Grid */}
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {sortedProducts.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-lg text-muted-foreground">No products found matching your search.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {sortedProducts.map((product) => (
-                <Card key={product.id} className="group hover:shadow-lg transition-shadow border-0 shadow-card">
-                  <CardContent className="p-0">
-                    <div className="aspect-square overflow-hidden rounded-t-lg">
-                      <img
-                        src={product.image_url}
-                        alt={`${product.name} - Best Quality Cold Press Mustard Oil`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-foreground text-sm leading-tight">{product.name}</h3>
-                        <div className="flex items-center space-x-1">
-                          <Star className="h-3 w-3 fill-primary text-primary" />
-                          <span className="text-xs text-muted-foreground">4.8</span>
-                        </div>
-                      </div>
-                      
-                      <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-                        {product.description}
-                      </p>
-                      
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="text-lg font-bold text-foreground">
-                          ₹{product.price.toFixed(2)}
-                        </div>
-                        {product.stock_quantity > 0 ? (
-                          <Badge variant="secondary" className="text-xs">
-                            In Stock
-                          </Badge>
-                        ) : (
-                          <Badge variant="destructive" className="text-xs">
-                            Out of Stock
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                  
-                  <CardFooter className="p-4 pt-0">
-                    <Button 
-                      onClick={() => handleAddToCart(product.id)}
-                      disabled={product.stock_quantity === 0}
-                      className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90"
-                      size="sm"
+                {/* Info */}
+                <div className="p-4">
+                  <h3
+                    className="text-foreground mb-1 leading-snug"
+                    style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontWeight: 400,
+                      fontSize: "1.05rem",
+                    }}
+                  >
+                    {product.name}
+                  </h3>
+                  <p
+                    className="text-xs text-muted-foreground line-clamp-2 mb-3"
+                    style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
+                  >
+                    {product.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="text-foreground font-medium text-sm"
+                      style={{ fontFamily: "'Inter', sans-serif" }}
                     >
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      Add to Cart
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+                      ₹{product.price.toFixed(0)}
+                    </span>
+                    {product.stock_quantity === 0 && (
+                      <span
+                        className="text-xs text-muted-foreground"
+                        style={{ fontFamily: "'Inter', sans-serif" }}
+                      >
+                        Out of stock
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-      {/* SEO Content */}
-      <section className="py-12 bg-muted/30">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
-            Why Choose Our Cold-Pressed Mustard Oil?
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Our premium cold-pressed mustard oils are extracted using traditional methods that preserve natural nutrients, 
-            flavor, and health benefits. Each bottle contains pure, unrefined oil rich in omega-3 fatty acids, 
-            vitamin E, and natural antioxidants.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">Traditional Methods</h3>
-              <p className="text-muted-foreground">Cold-pressed using wooden churns to preserve nutrients</p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">Health Benefits</h3>
-              <p className="text-muted-foreground">Rich in omega-3, antioxidants, and essential fatty acids</p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">Pure Quality</h3>
-              <p className="text-muted-foreground">No chemicals, additives, or artificial processing</p>
-            </div>
+                {/* Hover-reveal CTA */}
+                <div className="cart-action absolute bottom-0 left-0 right-0 bg-background border-t border-border p-4 flex gap-2">
+                  <button
+                    onClick={() => handleAddToCart(product.id)}
+                    disabled={product.stock_quantity === 0}
+                    className="flex-1 btn-primary text-xs py-2 justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <ShoppingCart className="h-3.5 w-3.5" />
+                    Add to Cart
+                  </button>
+                  <Link
+                    to={`/products/${product.id}`}
+                    className="btn-minimal text-xs py-2 px-3"
+                    title="View details"
+                  >
+                    <LinkIcon className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
+        )}
+      </div>
+
+      {/* ── Bottom note ───────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 pb-24">
+        <div className="border-t border-border pt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            { title: "Traditional Methods", desc: "Cold-pressed using wooden churns to preserve nutrients." },
+            { title: "No Additives", desc: "No chemicals, no artificial processing. Pure and unrefined." },
+            { title: "Tested Batches", desc: "Every batch checked for purity, acidity, and nutritional content." },
+          ].map((item) => (
+            <div key={item.title}>
+              <h4
+                className="text-foreground mb-2"
+                style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: "1.1rem" }}
+              >
+                {item.title}
+              </h4>
+              <p
+                className="text-sm text-muted-foreground"
+                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
+              >
+                {item.desc}
+              </p>
+            </div>
+          ))}
         </div>
-      </section>
+      </div>
     </div>
   );
 };

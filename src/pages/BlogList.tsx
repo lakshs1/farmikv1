@@ -200,7 +200,7 @@ export const BlogList = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 pt-24">
       {/* Hero Header */}
       <section className="bg-gradient-to-br from-primary/10 via-background to-accent/5 py-16 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
