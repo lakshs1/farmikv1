@@ -1,9 +1,39 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { Heart, Leaf, Award, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import farmikLogo from "@/assets/farmik-oils-logo.png";
 import mustardOilProduct from "@/assets/mustard-oil-product.jpg";
 
 const About = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const allowedEmails = [
+        "annupusa01@gmail.com",
+        "annu_pusa@yahoo.co.in",
+        "lakshyaj8779@gmail.com"
+      ];
+
+      // Check if Ctrl + Shift + A is pressed
+      if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
+        e.preventDefault();
+        
+        // Only reveal/redirect if the logged-in user is one of the allowed admin emails
+        if (user && user.email && allowedEmails.includes(user.email.toLowerCase().trim())) {
+          navigate("/admin/login");
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [user, navigate]);
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}

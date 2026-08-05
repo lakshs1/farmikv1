@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Shield, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminLogin = () => {
   const [credentials, setCredentials] = useState({
-    username: "",
+    email: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -21,14 +22,61 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
 
+    const allowedEmails = [
+      "annupusa01@gmail.com",
+      "annu_pusa@yahoo.co.in",
+      "lakshyaj8779@gmail.com"
+    ];
+
+    const emailClean = credentials.email.toLowerCase().trim();
+
+    if (!allowedEmails.includes(emailClean)) {
+      toast({
+        title: "Access Denied",
+        description: "This email is not authorized as an admin",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
-      // For now, use hardcoded credentials
-      // In production, this would authenticate against a secure admin system
-      if (credentials.username === "admin" && credentials.password === "farmik123") {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailClean,
+        password: credentials.password,
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        // Ensure their role in profiles table is 'admin' so RLS works
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('user_id', data.user.id)
+          .single();
+
+        if (profile && profile.role !== 'admin') {
+          await supabase
+            .from('profiles')
+            .update({ role: 'admin' })
+            .eq('user_id', data.user.id);
+        } else if (!profile) {
+          // If profile doesn't exist, create it as admin
+          await supabase
+            .from('profiles')
+            .insert({
+              user_id: data.user.id,
+              email: data.user.email!,
+              full_name: data.user.user_metadata?.full_name || 'Admin',
+              role: 'admin'
+            });
+        }
+
         // Store admin session in localStorage
         localStorage.setItem("adminSession", JSON.stringify({
           isAdmin: true,
-          username: credentials.username,
+          email: data.user.email,
           loginTime: new Date().toISOString()
         }));
         
@@ -38,17 +86,11 @@ const AdminLogin = () => {
         });
         
         navigate("/admin/dashboard");
-      } else {
-        toast({
-          title: "Login failed",
-          description: "Invalid username or password",
-          variant: "destructive",
-        });
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "An error occurred during login",
+        title: "Login failed",
+        description: error.message || "Invalid credentials",
         variant: "destructive",
       });
     } finally {
@@ -72,14 +114,14 @@ const AdminLogin = () => {
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="email">Admin Email</Label>
                 <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter admin username"
-                  value={credentials.username}
+                  id="email"
+                  type="email"
+                  placeholder="Enter admin email"
+                  value={credentials.email}
                   onChange={(e) =>
-                    setCredentials(prev => ({ ...prev, username: e.target.value }))
+                    setCredentials(prev => ({ ...prev, email: e.target.value }))
                   }
                   required
                   className="border-muted-foreground/20 focus:border-primary"
@@ -134,9 +176,7 @@ const AdminLogin = () => {
 
             <div className="mt-8 p-4 bg-muted/50 rounded-lg">
               <p className="text-xs text-muted-foreground text-center">
-                <strong>Demo Credentials:</strong><br />
-                Username: admin<br />
-                Password: farmik123
+                Authorized Admin Accounts only. Login via your registered Supabase credentials.
               </p>
             </div>
           </CardContent>
