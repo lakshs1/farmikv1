@@ -174,11 +174,11 @@ const Contact = () => {
               Phone
             </h3>
             <a
-              href="tel:+919876543210"
+              href="tel:08287317599"
               className="text-foreground hover:text-primary transition-colors"
               style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.1rem" }}
             >
-              +91 98765 43210
+              +91 82873 17599
             </a>
             <p className="text-xs text-muted-foreground mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>
               Mon–Sat, 9:00 AM – 7:00 PM
@@ -195,9 +195,8 @@ const Contact = () => {
               className="text-foreground leading-relaxed"
               style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.05rem" }}
             >
-              123 Traditional Oil Mill<br />
-              Mustard Fields, Punjab<br />
-              India – 140001
+              B-4, Block B, Sector 60<br />
+              Noida, Uttar Pradesh 201309
             </p>
           </div>
           <div>

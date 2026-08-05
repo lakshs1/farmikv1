@@ -100,13 +100,13 @@ export const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="tel:+919876543210" className="hover:text-foreground transition-colors">
-                  +91 98765 43210
+                <a href="tel:08287317599" className="hover:text-foreground transition-colors">
+                  +91 82873 17599
                 </a>
               </li>
               <li className="text-muted-foreground/80 leading-relaxed">
-                123 Traditional Oil Mill<br />
-                Mustard Fields, Punjab, India
+                B-4, Block B, Sector 60<br />
+                Noida, Uttar Pradesh 201309
               </li>
             </ul>
           </div>

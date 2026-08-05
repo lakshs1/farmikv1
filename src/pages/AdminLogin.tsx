@@ -4,14 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Shield, Eye, EyeOff } from "lucide-react";
+import { Shield, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+const ALLOWED_ADMINS = [
+  "annupusa01@gmail.com",
+  "annu_pusa@yahoo.co.in",
+  "lakshyaj8779@gmail.com",
+];
 
 const AdminLogin = () => {
-  const [credentials, setCredentials] = useState({
-    username: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -21,34 +26,46 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
 
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Enforce email whitelist check
+    if (!ALLOWED_ADMINS.includes(cleanEmail)) {
+      toast({
+        title: "Access Denied",
+        description: "This email address is not authorized for administrative access.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
-      // For now, use hardcoded credentials
-      // In production, this would authenticate against a secure admin system
-      if (credentials.username === "admin" && credentials.password === "farmik123") {
-        // Store admin session in localStorage
+      // Authenticate with Supabase Auth
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data.session) {
         localStorage.setItem("adminSession", JSON.stringify({
           isAdmin: true,
-          username: credentials.username,
+          email: cleanEmail,
           loginTime: new Date().toISOString()
         }));
-        
+
         toast({
-          title: "Login successful!",
-          description: "Welcome to the admin dashboard",
+          title: "Admin Login Successful",
+          description: `Welcome back, ${cleanEmail}`,
         });
-        
+
         navigate("/admin/dashboard");
-      } else {
-        toast({
-          title: "Login failed",
-          description: "Invalid username or password",
-          variant: "destructive",
-        });
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "An error occurred during login",
+        title: "Authentication Failed",
+        description: error.message || "Invalid credentials",
         variant: "destructive",
       });
     } finally {
@@ -57,88 +74,70 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center">
-      <div className="w-full max-w-md p-6">
-        <Card className="border-0 shadow-2xl">
-          <CardHeader className="text-center pb-8">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Shield className="w-8 h-8 text-primary" />
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <div className="w-full max-w-md">
+        <Card className="border border-border shadow-lg">
+          <CardHeader className="text-center pb-6">
+            <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-7 h-7 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold">Admin Access</CardTitle>
-            <p className="text-muted-foreground">
-              Enter your admin credentials to continue
+            <CardTitle className="text-2xl font-bold" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              Admin Portal
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+              Sign in with authorized administrator credentials
             </p>
           </CardHeader>
+
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter admin username"
-                  value={credentials.username}
-                  onChange={(e) =>
-                    setCredentials(prev => ({ ...prev, username: e.target.value }))
-                  }
-                  required
-                  className="border-muted-foreground/20 focus:border-primary"
-                />
+                <Label htmlFor="email">Admin Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="admin@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="pl-10"
+                  />
+                </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter admin password"
-                    value={credentials.password}
-                    onChange={(e) =>
-                      setCredentials(prev => ({ ...prev, password: e.target.value }))
-                    }
+                    placeholder="Enter password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="border-muted-foreground/20 focus:border-primary pr-10"
+                    className="pl-10 pr-10"
                   />
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </Button>
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
 
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90 farm-hover"
+                className="w-full btn-primary justify-center"
                 disabled={loading}
               >
-                {loading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Signing in...</span>
-                  </div>
-                ) : (
-                  "Sign In"
-                )}
+                {loading ? "Signing in..." : "Sign In to Admin Dashboard"}
               </Button>
             </form>
-
-            <div className="mt-8 p-4 bg-muted/50 rounded-lg">
-              <p className="text-xs text-muted-foreground text-center">
-                <strong>Demo Credentials:</strong><br />
-                Username: admin<br />
-                Password: farmik123
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>
