@@ -17,10 +17,16 @@ import {
   TrendingUp,
   Edit,
   Trash2,
-  Receipt
+  Receipt,
+  MessageSquare,
+  Mail,
+  Phone,
+  CheckCircle,
+  Eye
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import farmikLogo from "@/assets/farmik-oils-logo.png";
 
 interface Product {
   id: string;
@@ -61,6 +67,17 @@ interface OrderRecord {
   profiles?: CustomerProfile;
 }
 
+interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  subject: string;
+  message: string;
+  status: "new" | "read" | "replied";
+  created_at: string;
+}
+
 const ALLOWED_ADMINS = [
   "annupusa01@gmail.com",
   "annu_pusa@yahoo.co.in",
@@ -73,12 +90,17 @@ const AdminDashboard = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [customers, setCustomers] = useState<CustomerProfile[]>([]);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
   // Edit Product Modal State
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  // View Message Detail Modal State
+  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
 
   const [newProduct, setNewProduct] = useState<NewProduct>({
     name: "",
@@ -111,7 +133,7 @@ const AdminDashboard = () => {
         return;
       }
 
-      await Promise.all([fetchProducts(), fetchCustomers(), fetchOrders()]);
+      await Promise.all([fetchProducts(), fetchCustomers(), fetchOrders(), fetchContactMessages()]);
     } catch (err) {
       console.error("Auth check failed:", err);
       navigate("/admin/login");
@@ -159,6 +181,20 @@ const AdminDashboard = () => {
       setOrders(data || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
+    }
+  };
+
+  const fetchContactMessages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setMessages(data || []);
+    } catch (error) {
+      console.error('Error fetching contact messages:', error);
     }
   };
 
@@ -297,6 +333,69 @@ const AdminDashboard = () => {
     }
   };
 
+  // Contact Message Management Handlers
+  const handleUpdateMessageStatus = async (messageId: string, newStatus: "new" | "read" | "replied") => {
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .update({ status: newStatus })
+        .eq('id', messageId);
+
+      if (error) throw error;
+
+      setMessages(prev => prev.map(m => m.id === messageId ? { ...m, status: newStatus } : m));
+      if (selectedMessage && selectedMessage.id === messageId) {
+        setSelectedMessage(prev => prev ? { ...prev, status: newStatus } : null);
+      }
+
+      toast({
+        title: "Status Updated",
+        description: `Enquiry marked as ${newStatus}.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to update status",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!confirm("Are you sure you want to delete this enquiry message?")) return;
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .delete()
+        .eq('id', messageId);
+
+      if (error) throw error;
+
+      setMessages(prev => prev.filter(m => m.id !== messageId));
+      setIsMessageDialogOpen(false);
+      setSelectedMessage(null);
+
+      toast({
+        title: "Enquiry Deleted",
+        description: "Message removed.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Delete failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleOpenMessageModal = (msg: ContactMessage) => {
+    setSelectedMessage(msg);
+    setIsMessageDialogOpen(true);
+    if (msg.status === "new") {
+      handleUpdateMessageStatus(msg.id, "read");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-24">
@@ -307,21 +406,25 @@ const AdminDashboard = () => {
 
   const activeProducts = products.filter(p => p.is_active).length;
   const totalStock = products.reduce((sum, p) => sum + p.stock_quantity, 0);
+  const newMessagesCount = messages.filter(m => m.status === "new").length;
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-16">
+    <div className="min-h-screen bg-[#FAF9F5] pt-24 pb-16">
       {/* Header */}
-      <header className="border-b border-border bg-card mb-8">
+      <header className="border-b border-emerald-950/10 bg-white mb-8 shadow-xs">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-              Admin Dashboard
-            </h1>
-            <p className="text-xs text-muted-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>
-              Managing products, inventory, customers, and order history
-            </p>
+          <div className="flex items-center gap-3">
+            <img src={farmikLogo} alt="myfarmik logo" className="h-9 w-auto text-[#2D5A27]" />
+            <div>
+              <h1 className="text-2xl font-bold text-[#1A3C2A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                myfarmik Admin Portal
+              </h1>
+              <p className="text-xs text-gray-500" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                Managing products, orders, customers, and user contact enquiries
+              </p>
+            </div>
           </div>
-          <Button onClick={handleLogout} variant="outline" size="sm">
+          <Button onClick={handleLogout} variant="outline" size="sm" className="border-gray-300 text-gray-700 hover:bg-gray-50">
             <LogOut className="mr-2 h-4 w-4" />
             Logout
           </Button>
@@ -330,75 +433,182 @@ const AdminDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8 bg-white border border-emerald-950/10 p-1 rounded-xl shadow-xs">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="products">Manage Products ({products.length})</TabsTrigger>
+            <TabsTrigger value="products">Products ({products.length})</TabsTrigger>
+            <TabsTrigger value="queries" className="relative">
+              Enquiries ({messages.length})
+              {newMessagesCount > 0 && (
+                <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-emerald-700 text-white text-[10px] font-bold">
+                  {newMessagesCount} New
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="customers">Customers ({customers.length})</TabsTrigger>
             <TabsTrigger value="orders">Orders ({orders.length})</TabsTrigger>
           </TabsList>
 
           {/* Overview */}
           <TabsContent value="overview">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <Card>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+              <Card className="bg-white border-emerald-950/10">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-                  <Package className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs font-semibold uppercase tracking-wider text-gray-500">Products</CardTitle>
+                  <Package className="h-4 w-4 text-[#2D5A27]" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{products.length}</div>
-                  <p className="text-xs text-muted-foreground">{activeProducts} active in store</p>
+                  <div className="text-2xl font-bold text-gray-900">{products.length}</div>
+                  <p className="text-xs text-emerald-700 font-medium">{activeProducts} active in store</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-white border-emerald-950/10">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Total Inventory</CardTitle>
-                  <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs font-semibold uppercase tracking-wider text-gray-500">Inventory Stock</CardTitle>
+                  <ShoppingCart className="h-4 w-4 text-[#2D5A27]" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{totalStock}</div>
-                  <p className="text-xs text-muted-foreground">total stock units</p>
+                  <div className="text-2xl font-bold text-gray-900">{totalStock}</div>
+                  <p className="text-xs text-gray-500">total units available</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-white border-emerald-950/10">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Registered Customers</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs font-semibold uppercase tracking-wider text-gray-500">Contact Enquiries</CardTitle>
+                  <MessageSquare className="h-4 w-4 text-[#2D5A27]" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{customers.length}</div>
-                  <p className="text-xs text-muted-foreground">user profiles</p>
+                  <div className="text-2xl font-bold text-gray-900">{messages.length}</div>
+                  <p className="text-xs text-emerald-700 font-bold">{newMessagesCount} unread messages</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-white border-emerald-950/10">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-                  <Receipt className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs font-semibold uppercase tracking-wider text-gray-500">Registered Users</CardTitle>
+                  <Users className="h-4 w-4 text-[#2D5A27]" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{orders.length}</div>
-                  <p className="text-xs text-muted-foreground">customer transactions</p>
+                  <div className="text-2xl font-bold text-gray-900">{customers.length}</div>
+                  <p className="text-xs text-gray-500">customer profiles</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white border-emerald-950/10">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Orders</CardTitle>
+                  <Receipt className="h-4 w-4 text-[#2D5A27]" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">{orders.length}</div>
+                  <p className="text-xs text-gray-500">customer transactions</p>
                 </CardContent>
               </Card>
             </div>
           </TabsContent>
 
+          {/* Contact Enquiries / Messages Section */}
+          <TabsContent value="queries">
+            <Card className="bg-white border-emerald-950/10">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl font-bold text-[#1A3C2A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    Customer Contact Enquiries
+                  </CardTitle>
+                  <p className="text-xs text-gray-500">Messages submitted through the Contact Us form</p>
+                </div>
+                <Badge variant="outline" className="border-emerald-700 text-emerald-800 bg-emerald-50">
+                  {newMessagesCount} Unread
+                </Badge>
+              </CardHeader>
+              <CardContent>
+                {messages.length === 0 ? (
+                  <div className="text-center py-12 border border-dashed border-gray-200 rounded-xl">
+                    <MessageSquare className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                    <p className="text-gray-500 text-sm">No contact messages received yet.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="border-b border-gray-100 bg-gray-50 text-gray-600 uppercase text-[11px] font-bold tracking-wider">
+                        <tr>
+                          <th className="py-3 px-4">Date</th>
+                          <th className="py-3 px-4">Name</th>
+                          <th className="py-3 px-4">Contact Info</th>
+                          <th className="py-3 px-4">Subject</th>
+                          <th className="py-3 px-4">Status</th>
+                          <th className="py-3 px-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {messages.map((msg) => (
+                          <tr key={msg.id} className={`hover:bg-emerald-50/40 transition-colors ${msg.status === "new" ? "bg-emerald-50/20 font-medium" : ""}`}>
+                            <td className="py-3.5 px-4 text-xs text-gray-500 whitespace-nowrap">
+                              {new Date(msg.created_at).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            </td>
+                            <td className="py-3.5 px-4 font-semibold text-gray-900">{msg.name}</td>
+                            <td className="py-3.5 px-4 text-xs text-gray-600">
+                              <div>{msg.email}</div>
+                              {msg.phone && <div className="text-gray-400">{msg.phone}</div>}
+                            </td>
+                            <td className="py-3.5 px-4 text-xs text-gray-800 max-w-xs truncate">{msg.subject}</td>
+                            <td className="py-3.5 px-4">
+                              <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                msg.status === "new" 
+                                  ? "bg-amber-100 text-amber-800 border border-amber-300"
+                                  : msg.status === "read"
+                                  ? "bg-blue-100 text-blue-800 border border-blue-200"
+                                  : "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                              }`}>
+                                {msg.status}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleOpenMessageModal(msg)}
+                                  className="h-8 px-2.5 text-xs border-emerald-950/20 text-[#1A3C2A] hover:bg-emerald-50"
+                                  title="View Full Enquiry"
+                                >
+                                  <Eye className="w-3.5 h-3.5 mr-1" /> View
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleDeleteMessage(msg.id)}
+                                  className="h-8 w-8 p-0"
+                                  title="Delete Message"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Manage Products */}
           <TabsContent value="products">
-            <Card>
+            <Card className="bg-white border-emerald-950/10">
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Products & Inventory</CardTitle>
-                <Button onClick={() => setActiveTab("add-product")} size="sm" className="btn-primary">
+                <CardTitle className="text-xl font-bold text-[#1A3C2A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Products & Inventory</CardTitle>
+                <Button onClick={() => setActiveTab("add-product")} size="sm" className="bg-[#1A3C2A] hover:bg-[#2D5A27] text-white">
                   <Plus className="h-4 w-4 mr-1" /> Add Product
                 </Button>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {products.map((product) => (
-                    <Card key={product.id} className="overflow-hidden">
+                    <Card key={product.id} className="overflow-hidden bg-white border border-gray-100 shadow-xs">
                       <div className="aspect-[4/3] bg-muted relative">
                         <img
                           src={product.image_url}
@@ -407,19 +617,19 @@ const AdminDashboard = () => {
                         />
                         <Badge 
                           variant={product.is_active ? "default" : "secondary"}
-                          className="absolute top-2 right-2"
+                          className={`absolute top-2 right-2 ${product.is_active ? "bg-[#1A3C2A]" : "bg-gray-500"}`}
                         >
                           {product.is_active ? "Active" : "Inactive"}
                         </Badge>
                       </div>
                       <CardContent className="p-4">
-                        <h3 className="font-semibold text-base mb-1">{product.name}</h3>
-                        <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                        <h3 className="font-semibold text-base mb-1 text-gray-900">{product.name}</h3>
+                        <p className="text-xs text-gray-500 line-clamp-2 mb-3">
                           {product.description}
                         </p>
                         <div className="flex items-center justify-between mb-4">
-                          <span className="font-bold text-sm">₹{product.price}</span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="font-bold text-sm text-[#1A3C2A]">₹{product.price}</span>
+                          <span className="text-xs text-gray-600">
                             Stock: <strong>{product.stock_quantity}</strong>
                           </span>
                         </div>
@@ -429,7 +639,7 @@ const AdminDashboard = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => handleEditOpen(product)}
-                            className="flex-1"
+                            className="flex-1 text-xs"
                           >
                             <Edit className="h-3.5 w-3.5 mr-1" /> Edit
                           </Button>
@@ -437,6 +647,7 @@ const AdminDashboard = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => toggleProductStatus(product.id, product.is_active)}
+                            className="text-xs"
                           >
                             {product.is_active ? "Hide" : "Show"}
                           </Button>
@@ -444,6 +655,7 @@ const AdminDashboard = () => {
                             size="sm"
                             variant="destructive"
                             onClick={() => handleDeleteProduct(product.id)}
+                            className="w-8 h-8 p-0"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
@@ -458,17 +670,17 @@ const AdminDashboard = () => {
 
           {/* Customers */}
           <TabsContent value="customers">
-            <Card>
+            <Card className="bg-white border-emerald-950/10">
               <CardHeader>
-                <CardTitle>Customer Directory</CardTitle>
+                <CardTitle className="text-xl font-bold text-[#1A3C2A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Customer Directory</CardTitle>
               </CardHeader>
               <CardContent>
                 {customers.length === 0 ? (
-                  <p className="text-muted-foreground text-sm py-6">No customer profiles found.</p>
+                  <p className="text-gray-500 text-sm py-6">No customer profiles found.</p>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                      <thead className="border-b border-border text-muted-foreground uppercase text-xs">
+                      <thead className="border-b border-gray-100 bg-gray-50 text-gray-600 uppercase text-[11px] font-bold">
                         <tr>
                           <th className="py-3 px-4">Name</th>
                           <th className="py-3 px-4">Email</th>
@@ -476,13 +688,13 @@ const AdminDashboard = () => {
                           <th className="py-3 px-4">Joined Date</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-border">
+                      <tbody className="divide-y divide-gray-100">
                         {customers.map((c) => (
-                          <tr key={c.id} className="hover:bg-muted/50">
-                            <td className="py-3 px-4 font-medium">{c.full_name || "N/A"}</td>
-                            <td className="py-3 px-4 text-muted-foreground">{c.email || "N/A"}</td>
-                            <td className="py-3 px-4 text-muted-foreground">{c.phone || "N/A"}</td>
-                            <td className="py-3 px-4 text-muted-foreground">
+                          <tr key={c.id} className="hover:bg-emerald-50/40">
+                            <td className="py-3 px-4 font-medium text-gray-900">{c.full_name || "N/A"}</td>
+                            <td className="py-3 px-4 text-gray-600">{c.email || "N/A"}</td>
+                            <td className="py-3 px-4 text-gray-600">{c.phone || "N/A"}</td>
+                            <td className="py-3 px-4 text-gray-500 text-xs">
                               {new Date(c.created_at).toLocaleDateString()}
                             </td>
                           </tr>
@@ -497,17 +709,17 @@ const AdminDashboard = () => {
 
           {/* Orders */}
           <TabsContent value="orders">
-            <Card>
+            <Card className="bg-white border-emerald-950/10">
               <CardHeader>
-                <CardTitle>Order History</CardTitle>
+                <CardTitle className="text-xl font-bold text-[#1A3C2A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Order History</CardTitle>
               </CardHeader>
               <CardContent>
                 {orders.length === 0 ? (
-                  <p className="text-muted-foreground text-sm py-6">No orders recorded yet.</p>
+                  <p className="text-gray-500 text-sm py-6">No orders recorded yet.</p>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                      <thead className="border-b border-border text-muted-foreground uppercase text-xs">
+                      <thead className="border-b border-gray-100 bg-gray-50 text-gray-600 uppercase text-[11px] font-bold">
                         <tr>
                           <th className="py-3 px-4">Order ID</th>
                           <th className="py-3 px-4">Customer</th>
@@ -516,16 +728,16 @@ const AdminDashboard = () => {
                           <th className="py-3 px-4">Date</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-border">
+                      <tbody className="divide-y divide-gray-100">
                         {orders.map((o) => (
-                          <tr key={o.id} className="hover:bg-muted/50">
-                            <td className="py-3 px-4 font-mono text-xs">{o.id.slice(0, 8)}...</td>
-                            <td className="py-3 px-4">{o.profiles?.full_name || o.user_id}</td>
-                            <td className="py-3 px-4 font-bold">₹{o.total_amount}</td>
+                          <tr key={o.id} className="hover:bg-emerald-50/40">
+                            <td className="py-3 px-4 font-mono text-xs text-gray-700">{o.id.slice(0, 8)}...</td>
+                            <td className="py-3 px-4 text-gray-900 font-medium">{o.profiles?.full_name || o.user_id}</td>
+                            <td className="py-3 px-4 font-bold text-[#1A3C2A]">₹{o.total_amount}</td>
                             <td className="py-3 px-4">
-                              <Badge variant="outline">{o.status || "Completed"}</Badge>
+                              <Badge variant="outline" className="border-emerald-700 text-emerald-800">{o.status || "Completed"}</Badge>
                             </td>
-                            <td className="py-3 px-4 text-muted-foreground">
+                            <td className="py-3 px-4 text-gray-500 text-xs">
                               {new Date(o.created_at).toLocaleDateString()}
                             </td>
                           </tr>
@@ -540,9 +752,9 @@ const AdminDashboard = () => {
 
           {/* Add Product Tab */}
           <TabsContent value="add-product">
-            <Card>
+            <Card className="bg-white border-emerald-950/10">
               <CardHeader>
-                <CardTitle>Add New Product</CardTitle>
+                <CardTitle className="text-xl font-bold text-[#1A3C2A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Add New Product</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleAddProduct} className="space-y-6 max-w-2xl">
@@ -608,7 +820,7 @@ const AdminDashboard = () => {
                     />
                   </div>
 
-                  <Button type="submit" className="btn-primary">
+                  <Button type="submit" className="bg-[#1A3C2A] hover:bg-[#2D5A27] text-white">
                     <Plus className="mr-2 h-4 w-4" /> Add Product
                   </Button>
                 </form>
@@ -621,9 +833,9 @@ const AdminDashboard = () => {
       {/* Edit Product Modal */}
       {isEditDialogOpen && editingProduct && (
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg bg-white">
             <DialogHeader>
-              <DialogTitle>Edit Product — {editingProduct.name}</DialogTitle>
+              <DialogTitle className="text-lg font-bold text-[#1A3C2A]">Edit Product — {editingProduct.name}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
@@ -677,7 +889,103 @@ const AdminDashboard = () => {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleSaveEdit} className="btn-primary">Save Changes</Button>
+              <Button onClick={handleSaveEdit} className="bg-[#1A3C2A] hover:bg-[#2D5A27] text-white">Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* View Contact Enquiry Modal */}
+      {isMessageDialogOpen && selectedMessage && (
+        <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
+          <DialogContent className="max-w-lg bg-white">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold text-[#1A3C2A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                Enquiry Details
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-3 text-sm">
+              <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl">
+                <div>
+                  <p className="text-[11px] font-bold text-gray-500 uppercase">Sender Name</p>
+                  <p className="font-bold text-gray-900">{selectedMessage.name}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-bold text-gray-500 uppercase">Received Date</p>
+                  <p className="text-gray-700 text-xs">
+                    {new Date(selectedMessage.created_at).toLocaleString("en-IN")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-[#2D5A27]" />
+                  <a href={`mailto:${selectedMessage.email}`} className="text-xs text-emerald-800 font-semibold underline">
+                    {selectedMessage.email}
+                  </a>
+                </div>
+                {selectedMessage.phone && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-[#2D5A27]" />
+                    <a href={`tel:${selectedMessage.phone}`} className="text-xs text-emerald-800 font-semibold underline">
+                      {selectedMessage.phone}
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-gray-100 pt-3">
+                <p className="text-[11px] font-bold text-gray-500 uppercase mb-1">Subject</p>
+                <p className="font-semibold text-gray-900">{selectedMessage.subject}</p>
+              </div>
+
+              <div className="bg-[#FAF9F5] p-4 rounded-xl border border-emerald-950/10">
+                <p className="text-[11px] font-bold text-gray-500 uppercase mb-1">Message Content</p>
+                <p className="text-gray-800 leading-relaxed text-sm whitespace-pre-wrap">
+                  {selectedMessage.message}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-xs font-semibold text-gray-600">Update Status:</span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant={selectedMessage.status === "read" ? "default" : "outline"}
+                    onClick={() => handleUpdateMessageStatus(selectedMessage.id, "read")}
+                    className="text-xs h-8"
+                  >
+                    Mark Read
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={selectedMessage.status === "replied" ? "default" : "outline"}
+                    onClick={() => handleUpdateMessageStatus(selectedMessage.id, "replied")}
+                    className="text-xs h-8 bg-emerald-800 text-white hover:bg-emerald-900"
+                  >
+                    <CheckCircle className="w-3.5 h-3.5 mr-1" /> Mark Replied
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                variant="destructive"
+                onClick={() => handleDeleteMessage(selectedMessage.id)}
+                size="sm"
+              >
+                Delete Enquiry
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setIsMessageDialogOpen(false)}
+                size="sm"
+              >
+                Close
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

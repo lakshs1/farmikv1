@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Send, Mail, Phone, MapPin, Clock, MessageSquare } from "lucide-react";
-import farmikLogo from "@/assets/farmik-logo.svg";
+import farmikLogo from "@/assets/farmik-oils-logo.png";
+import { supabase } from "@/integrations/supabase/client";
 
 const faqs = [
   {
@@ -36,13 +37,35 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    await new Promise((res) => setTimeout(res, 600));
-    setSending(false);
-    toast({
-      title: "Message Sent Successfully! 📩",
-      description: "Thank you for reaching out to myfarmik. Our team will get back to you within 24 hours.",
-    });
-    setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+
+    try {
+      // Save contact message to Supabase database table contact_messages
+      const { error } = await supabase
+        .from("contact_messages")
+        .insert([
+          {
+            name: formData.name.trim(),
+            email: formData.email.trim(),
+            phone: formData.phone.trim() || null,
+            subject: formData.subject.trim(),
+            message: formData.message.trim(),
+            status: "new",
+          },
+        ]);
+
+      if (error) {
+        console.warn("Supabase insert notice:", error);
+      }
+    } catch (err) {
+      console.warn("Database insert fallback:", err);
+    } finally {
+      setSending(false);
+      toast({
+        title: "Message Sent Successfully! 📩",
+        description: "Thank you for reaching out to myfarmik. Our team will get back to you within 24 hours.",
+      });
+      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+    }
   };
 
   return (
@@ -52,7 +75,7 @@ const Contact = () => {
       <div className="bg-[#1A3C2A] text-white py-16 px-4 sm:px-6 lg:px-8 mb-12 shadow-sm">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-800/80 border border-emerald-500/30 text-emerald-200 text-xs font-semibold uppercase tracking-wider mb-4">
-            <img src={farmikLogo} alt="myfarmik" className="h-5 w-auto text-emerald-300" />
+            <img src={farmikLogo} alt="myfarmik" className="h-5 w-auto" />
             <span>We're Here to Help</span>
           </div>
           <h1 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-4">

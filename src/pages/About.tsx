@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ShieldCheck, Award, Heart, CheckCircle2, ArrowRight } from "lucide-react";
-import farmikLogo from "@/assets/farmik-logo.svg";
+import farmikLogo from "@/assets/farmik-oils-logo.png";
 
 const timeline = [
   { n: "01", title: "Direct Seed Sourcing", desc: "Sourcing certified non-GMO mustard and oilseeds directly from organic farmers." },

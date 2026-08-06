@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingCart, User, X, Search, Menu, Leaf } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
-import farmikLogo from "@/assets/farmik-logo.svg";
+import farmikLogo from "@/assets/farmik-oils-logo.png";
 
 export const Header = () => {
   const [scrolled, setScrolled] = useState(false);

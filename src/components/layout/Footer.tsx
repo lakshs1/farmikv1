@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Youtube, Mail, Phone, MapPin, ShieldCheck, Truck, RefreshCw } from "lucide-react";
-import farmikLogo from "@/assets/farmik-logo.svg";
+import farmikLogo from "@/assets/farmik-oils-logo.png";
 
 export const Footer = () => {
   const year = new Date().getFullYear();
