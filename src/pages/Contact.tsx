@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
-import { Send, Mail, Phone, MapPin, Clock, MessageSquareCheck } from "lucide-react";
+import { Send, Mail, Phone, MapPin, Clock, MessageSquare } from "lucide-react";
 import farmikLogo from "@/assets/farmik-logo.svg";
 
 const faqs = [
@@ -130,7 +130,7 @@ const Contact = () => {
 
             <div className="border-t border-gray-100 pt-6">
               <div className="bg-[#FAF9F5] p-4 rounded-2xl border border-emerald-950/5 flex items-center gap-3">
-                <MessageSquareCheck className="w-6 h-6 text-[#2D5A27] shrink-0" />
+                <MessageSquare className="w-6 h-6 text-[#2D5A27] shrink-0" />
                 <p className="text-xs text-gray-600">
                   Looking for bulk oil distribution for retail or restaurant supply? Mention "Bulk Request" in your message subject.
                 </p>
