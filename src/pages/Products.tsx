@@ -346,9 +346,10 @@ const Products = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {sorted.map((product) => (
-              <div
+              <Link
                 key={product.id}
-                className="group bg-white rounded-2xl border border-emerald-950/10 hover:border-emerald-500/40 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden"
+                to={`/products/${product.id}`}
+                className="group bg-white rounded-2xl border border-emerald-950/10 hover:border-emerald-500/40 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden cursor-pointer no-underline text-inherit"
               >
                 {/* Product Image Container */}
                 <div className="relative aspect-[4/3] bg-emerald-50/40 overflow-hidden">
@@ -412,7 +413,7 @@ const Products = () => {
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => handleAddToCart(product)}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(product); }}
                         disabled={product.stock_quantity === 0}
                         className={`flex-1 py-3 px-4 rounded-xl text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2 transition-all ${
                           addedIds[product.id]
@@ -431,18 +432,17 @@ const Products = () => {
                         )}
                       </button>
 
-                      <Link
-                        to={`/products/${product.id}`}
+                      <span
                         className="p-3 rounded-xl border border-gray-200 text-gray-600 hover:text-[#1A3C2A] hover:bg-emerald-50 transition-colors"
                         title="View Details"
                       >
                         <Eye className="w-4 h-4" />
-                      </Link>
+                      </span>
                     </div>
                   </div>
 
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

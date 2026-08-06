@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Clock, Calendar, Share2, Facebook, Twitter, Link2, HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
@@ -262,7 +263,7 @@ export const BlogDetail = () => {
       "name": "Farmik Oils",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://myfarmik.com/assets/farmik-oils-logo.png"
+        "url": "https://myfarmik.com/logo-farmik.png"
       }
     }
   } : null;

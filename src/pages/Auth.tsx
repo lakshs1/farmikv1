@@ -4,7 +4,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
-import farmikLogo from "@/assets/farmik-oils-logo.png";
+import farmikLogo from "@/assets/logo-farmik.png";
 
 const FloatInput = ({
   id, label, type = "text", value, onChange, required = false, minLength,
@@ -108,12 +108,12 @@ const Auth = () => {
 
         {/* Logo */}
         <div className="flex items-center gap-3 mb-12">
-          <img src={farmikLogo} alt="Farmik Oils" className="h-8 w-auto" />
+          <img src={farmikLogo} alt="myfarmik" className="h-8 w-auto" />
           <span
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
             className="text-xl font-medium text-foreground"
           >
-            Farmik Oils
+            myfarmik
           </span>
         </div>
 

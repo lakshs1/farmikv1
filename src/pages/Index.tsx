@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef } from "react";
-import farmikLogo from "@/assets/farmik-oils-logo.png";
-import mustardOilProduct from "@/assets/mustard-oil-product.jpg";
 import farmikProducts from "@/assets/farmik-products.jpg";
 
 /* ─── Scroll reveal hook ─────────────────────────────────────── */
@@ -241,7 +239,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="relative aspect-[16/6] overflow-hidden">
             <img
-              src={mustardOilProduct}
+              src={farmikProducts}
               alt="Farmik cold-pressed mustard oil"
               className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700"
             />

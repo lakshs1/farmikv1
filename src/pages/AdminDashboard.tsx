@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import farmikLogo from "@/assets/farmik-oils-logo.png";
+import farmikLogo from "@/assets/logo-farmik.png";
 
 interface Product {
   id: string;

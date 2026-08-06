@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Send, Mail, Phone, MapPin, Clock, MessageSquare } from "lucide-react";
-import farmikLogo from "@/assets/farmik-oils-logo.png";
+import farmikLogo from "@/assets/logo-farmik.png";
 import { supabase } from "@/integrations/supabase/client";
 
 const faqs = [

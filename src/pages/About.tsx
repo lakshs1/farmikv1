@@ -1,7 +1,14 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ShieldCheck, Award, Heart, CheckCircle2, ArrowRight } from "lucide-react";
-import farmikLogo from "@/assets/farmik-oils-logo.png";
+import farmikLogo from "@/assets/logo-farmik.png";
+import { useAuth } from "@/hooks/useAuth";
+
+const ALLOWED_ADMINS = [
+  "annupusa01@gmail.com",
+  "annu_pusa@yahoo.co.in",
+  "lakshyaj8779@gmail.com",
+];
 
 const timeline = [
   { n: "01", title: "Direct Seed Sourcing", desc: "Sourcing certified non-GMO mustard and oilseeds directly from organic farmers." },
@@ -20,9 +27,31 @@ const values = [
 ];
 
 const About = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Shortcut Ctrl + Shift + A or Cmd + Shift + A to access Admin Panel
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "A" || e.key === "a")) {
+        e.preventDefault();
+        const adminSession = localStorage.getItem("adminSession");
+        const sessionEmail = user?.email?.toLowerCase().trim() || 
+                             (adminSession ? JSON.parse(adminSession).email?.toLowerCase().trim() : null);
+
+        if (sessionEmail && ALLOWED_ADMINS.includes(sessionEmail)) {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/admin/login");
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-[#FAF9F5] text-gray-800 pt-24 pb-20">
@@ -31,7 +60,7 @@ const About = () => {
       <section className="relative bg-[#1A3C2A] text-white py-20 px-4 sm:px-6 lg:px-8 overflow-hidden mb-16">
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-800/80 border border-emerald-500/30 text-emerald-200 text-xs font-semibold uppercase tracking-wider mb-6">
-            <img src={farmikLogo} alt="myfarmik" className="h-5 w-auto text-emerald-300" />
+            <img src={farmikLogo} alt="myfarmik" className="h-6 w-auto" />
             <span>The myfarmik Story</span>
           </div>
 
@@ -86,7 +115,7 @@ const About = () => {
           </div>
 
           <div className="relative bg-white p-8 rounded-3xl border border-emerald-950/10 shadow-lg text-center space-y-6">
-            <img src={farmikLogo} alt="myfarmik emblem" className="h-20 w-auto mx-auto text-[#2D5A27]" />
+            <img src={farmikLogo} alt="myfarmik emblem" className="h-20 w-auto mx-auto" />
             <h3 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-2xl font-bold text-gray-900">
               "Purity is not a feature — it's our promise."
             </h3>
