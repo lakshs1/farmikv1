@@ -1,257 +1,156 @@
-import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import farmikLogo from "@/assets/farmik-oils-logo.png";
-import mustardOilProduct from "@/assets/mustard-oil-product.jpg";
-import farmikProducts from "@/assets/farmik-products.jpg";
-
-function useReveal(rootMargin = "0px 0px -80px 0px") {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { el.classList.add("is-visible"); obs.unobserve(el); } },
-      { rootMargin }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return ref;
-}
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { ShieldCheck, Award, Heart, CheckCircle2, ArrowRight } from "lucide-react";
+import farmikLogo from "@/assets/farmik-logo.svg";
 
 const timeline = [
-  { n: "01", title: "Seed Selection", desc: "Sourcing from trusted farmers who grow without pesticides across Punjab and Rajasthan." },
-  { n: "02", title: "Washing & Drying", desc: "Seeds are cleaned and sun-dried before pressing. No artificial drying or pre-treatment." },
-  { n: "03", title: "Cold Pressing", desc: "Slow mechanical pressing at ambient temperature. No external heat. No hexane." },
-  { n: "04", title: "Gravity Filtration", desc: "Oil is filtered by gravity over 24–48 hours through natural cloth. No centrifuge." },
-  { n: "05", title: "Batch Testing", desc: "Purity, acidity, and free fatty acid content tested in every batch before dispatch." },
-  { n: "06", title: "Bottling", desc: "Filled into dark glass or food-grade HDPE bottles to protect from light degradation." },
+  { n: "01", title: "Direct Seed Sourcing", desc: "Sourcing certified non-GMO mustard and oilseeds directly from organic farmers." },
+  { n: "02", title: "Sun Cleaning & Drying", desc: "Seeds are cleaned and sun-dried to optimal moisture without chemical treatment." },
+  { n: "03", title: "Wooden Churn Cold Press", desc: "Slow mechanical extraction below 45°C using age-old wooden churners (Kachi Ghani)." },
+  { n: "04", title: "Cloth Gravity Filtration", desc: "Natural 48-hour gravity settling through unbleached cotton cloth. No chemical centrifuge." },
+  { n: "05", title: "Laboratory Quality Testing", desc: "Purity, acidity, and fatty acid profile tested for every batch before packaging." },
+  { n: "06", title: "Eco Glass & Canister Bottling", desc: "Sealed in protective containers to prevent light degradation and retain peak freshness." },
 ];
 
 const values = [
-  { title: "Honest Extraction", desc: "No hexane. No bleach. No deodoriser. What comes out of the press is what goes into the bottle." },
-  { title: "Farmer Partnerships", desc: "We work directly with small farmers. No middlemen, fair prices, long-term relationships." },
-  { title: "Traceability", desc: "We know which farm every batch came from. You can ask — we'll tell you." },
-  { title: "Slow & Deliberate", desc: "We press in small batches. We don't rush. Quality over volume, every time." },
+  { title: "Honest Extraction", desc: "No hexane, no chemical solvents, no bleach, no artificial deodorizers. Pure oil straight from the press." },
+  { title: "Farmer Fair Trade", desc: "Direct partnerships with local farming families, eliminating middleman exploitation with fair pricing." },
+  { title: "Full Batch Traceability", desc: "Complete transparency for every bottle back to the specific farm region and press date." },
+  { title: "Slow & Deliberate", desc: "We press in small batches with patience. Quality over volume, preserving natural health benefits." },
 ];
 
 const About = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const valuesRef = useReveal();
-  const timelineRef = useReveal();
-  const storyRef = useReveal();
-
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const allowedEmails = ["annupusa01@gmail.com", "annu_pusa@yahoo.co.in", "lakshyaj8779@gmail.com"];
-      if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
-        e.preventDefault();
-        if (user?.email && allowedEmails.includes(user.email.toLowerCase().trim())) {
-          navigate("/admin/login");
-        }
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [user, navigate]);
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-background page-enter pt-24">
-
-      {/* ── Hero ──────────────────────────────────────────── */}
-      <section className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <p
-              className="text-xs uppercase tracking-[0.18em] text-primary mb-4"
-              style={{ fontFamily: "'Inter', sans-serif" }}
-            >
-              About Farmik
-            </p>
-            <h1
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
-              className="text-foreground mb-8"
-            >
-              Preserving tradition,<br />
-              <em>one press at a time.</em>
-            </h1>
-            <p
-              className="text-muted-foreground leading-relaxed text-lg"
-              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
-            >
-              Farmik began with a simple conviction: that the best mustard oil is the least processed mustard oil.
-              We set out to bring back the kind of oil your grandparents knew — pressed slowly, without shortcuts.
-            </p>
-          </div>
-          <div className="relative aspect-[4/5] overflow-hidden">
-            <img
-              src={farmikProducts}
-              alt="Farmik Oils production"
-              className="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-700"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ── Story ─────────────────────────────────────────── */}
-      <section className="py-24 bg-card border-y border-border">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div ref={storyRef} className="reveal grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="relative aspect-[4/5] overflow-hidden lg:order-1 order-2">
-              <img
-                src={mustardOilProduct}
-                alt="Traditional cold-press process"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="lg:order-2 order-1">
-              <p
-                className="text-xs uppercase tracking-[0.18em] text-primary mb-4"
-                style={{ fontFamily: "'Inter', sans-serif" }}
-              >
-                Our Story
-              </p>
-              <h2
-                style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
-                className="text-foreground mb-8"
-              >
-                Started in Punjab.<br />
-                <em>Grown from conviction.</em>
-              </h2>
-              <div
-                className="space-y-4 text-muted-foreground leading-relaxed"
-                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
-              >
-                <p>
-                  Founded with a vision to preserve traditional oil extraction methods, Farmik began as a small
-                  family operation in the heart of Punjab's mustard fields. Our founders saw that modern processing
-                  was stripping away the very things that made mustard oil worth using.
-                </p>
-                <p>
-                  Today, we continue this legacy using time-honored cold-press techniques passed down through
-                  generations. Our wooden churns and traditional stone mills ensure every drop of oil retains
-                  its natural nutrients, authentic flavour, and health benefits.
-                </p>
-                <p>
-                  We believe the best products come from respecting both nature and tradition. We source only
-                  the finest mustard seeds and extract oil at temperatures that preserve its natural properties.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Process timeline ──────────────────────────────── */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="max-w-xl mb-16">
-            <p
-              className="text-xs uppercase tracking-[0.18em] text-primary mb-3"
-              style={{ fontFamily: "'Inter', sans-serif" }}
-            >
-              The Method
-            </p>
-            <h2
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
-              className="text-foreground"
-            >
-              Cold-press, step by step
-            </h2>
+    <div className="min-h-screen bg-[#FAF9F5] text-gray-800 pt-24 pb-20">
+      
+      {/* ── Hero Section ───────────────────────────────────────── */}
+      <section className="relative bg-[#1A3C2A] text-white py-20 px-4 sm:px-6 lg:px-8 overflow-hidden mb-16">
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-800/80 border border-emerald-500/30 text-emerald-200 text-xs font-semibold uppercase tracking-wider mb-6">
+            <img src={farmikLogo} alt="myfarmik" className="h-5 w-auto text-emerald-300" />
+            <span>The myfarmik Story</span>
           </div>
 
-          <div ref={timelineRef} className="reveal-children space-y-0 divide-y divide-border">
-            {timeline.map((step) => (
-              <div
-                key={step.n}
-                className="grid grid-cols-[60px_1fr] md:grid-cols-[80px_200px_1fr] items-start gap-6 py-8 group cursor-default"
-              >
-                <span
-                  className="text-primary/30 group-hover:text-primary transition-colors duration-300"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, fontSize: "1.8rem" }}
-                >
-                  {step.n}
-                </span>
-                <h3
-                  className="text-foreground"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: "1.1rem" }}
-                >
-                  {step.title}
-                </h3>
-                <p
-                  className="text-muted-foreground text-sm leading-relaxed md:col-start-3"
-                  style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
-                >
-                  {step.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Values ────────────────────────────────────────── */}
-      <section className="py-24 bg-card border-y border-border">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="max-w-xl mb-16">
-            <p
-              className="text-xs uppercase tracking-[0.18em] text-primary mb-3"
-              style={{ fontFamily: "'Inter', sans-serif" }}
-            >
-              What We Stand For
-            </p>
-            <h2
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
-              className="text-foreground"
-            >
-              Our commitments
-            </h2>
-          </div>
-
-          <div ref={valuesRef} className="reveal-children grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
-            {values.map((v) => (
-              <div key={v.title} className="bg-card p-8 hover:bg-background transition-colors duration-300">
-                <div className="w-8 h-px bg-primary mb-6" />
-                <h3
-                  className="text-foreground mb-3"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: "1.1rem" }}
-                >
-                  {v.title}
-                </h3>
-                <p
-                  className="text-sm text-muted-foreground leading-relaxed"
-                  style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
-                >
-                  {v.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Quality promise ───────────────────────────────── */}
-      <section className="py-24">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-          <div className="w-8 h-px bg-primary mx-auto mb-8" />
-          <h2
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
-            className="text-foreground mb-8"
+          <h1
+            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            className="text-4xl sm:text-6xl font-bold tracking-tight text-white mb-6 leading-tight"
           >
-            <em>"We don't rush the press.<br />The oil takes the time it needs."</em>
-          </h2>
-          <p
-            className="text-muted-foreground leading-relaxed"
-            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}
-          >
-            Every bottle of Farmik Oils undergoes purity testing before it leaves our facility.
-            We stand behind each batch with full traceability — from the farm where the seeds
-            were grown to the bottle in your kitchen.
+            Preserving Purity & Tradition,<br />
+            <span className="italic text-emerald-300 font-normal">From Our Farm to Your Kitchen.</span>
+          </h1>
+
+          <p className="text-emerald-100/90 text-base sm:text-lg max-w-3xl mx-auto font-light leading-relaxed mb-8">
+            <strong className="font-semibold text-white">myfarmik</strong> was born with a single conviction: that true nutrition comes from unprocessed, honest food. We bring back the authentic cold-pressed mustard oil your ancestors relied on — pressed slowly without shortcuts.
           </p>
+
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white text-[#1A3C2A] font-bold text-xs uppercase tracking-wider hover:bg-emerald-100 transition-all shadow-md"
+          >
+            <span>Explore Our Oil Collection</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </section>
+
+      {/* ── Mission & Vision ───────────────────────────────────── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          
+          <div className="space-y-6">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#2D5A27]">Our Roots</span>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-3xl sm:text-4xl font-bold text-[#1A3C2A] leading-snug">
+              Reclaiming the True Taste of Traditional Cold-Pressed Oils
+            </h2>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Modern industrial oil refining uses high-heat distillation and chemical solvents like hexane to extract maximum oil volume, destroying natural vitamins and aromatic pungency in the process.
+            </p>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              At <strong className="text-gray-900">myfarmik</strong>, we reject chemical shortcuts. Using traditional wooden churns (Kachi Ghani), our oil is pressed gently at low temperatures. The result is pure, nutrient-rich oil loaded with natural Omega-3 fatty acids, vitamin E, and robust flavor.
+            </p>
+
+            <div className="pt-4 grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-emerald-950/10 shadow-xs">
+                <CheckCircle2 className="w-5 h-5 text-[#2D5A27] shrink-0" />
+                <span className="text-xs font-semibold text-gray-800">100% Kachi Ghani</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-emerald-950/10 shadow-xs">
+                <CheckCircle2 className="w-5 h-5 text-[#2D5A27] shrink-0" />
+                <span className="text-xs font-semibold text-gray-800">Zero Heat Extraction</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative bg-white p-8 rounded-3xl border border-emerald-950/10 shadow-lg text-center space-y-6">
+            <img src={farmikLogo} alt="myfarmik emblem" className="h-20 w-auto mx-auto text-[#2D5A27]" />
+            <h3 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-2xl font-bold text-gray-900">
+              "Purity is not a feature — it's our promise."
+            </h3>
+            <p className="text-xs text-gray-600 italic">
+              "We press in small batches with patience. Every drop delivered to your home represents our dedication to your family's health."
+            </p>
+            <div className="border-t border-gray-100 pt-4 flex justify-center items-center gap-6 text-xs text-gray-500">
+              <span className="flex items-center gap-1"><ShieldCheck className="w-4 h-4 text-emerald-700" /> Lab Certified</span>
+              <span className="flex items-center gap-1"><Award className="w-4 h-4 text-emerald-700" /> 100% Organic</span>
+              <span className="flex items-center gap-1"><Heart className="w-4 h-4 text-emerald-700" /> Heart Healthy</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── Process Steps ──────────────────────────────────────── */}
+      <section className="bg-white py-20 border-y border-emerald-950/10 my-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#2D5A27]">Step by Step</span>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-3xl sm:text-4xl font-bold text-[#1A3C2A] mt-2">
+              The myfarmik Extraction Method
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {timeline.map((item) => (
+              <div key={item.n} className="bg-[#FAF9F5] p-6 rounded-2xl border border-emerald-950/5 relative overflow-hidden group hover:border-emerald-500/30 transition-all">
+                <span style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-4xl font-bold text-emerald-800/20 group-hover:text-emerald-800/40 transition-colors">
+                  {item.n}
+                </span>
+                <h3 className="font-bold text-gray-900 text-base mt-2 mb-2">{item.title}</h3>
+                <p className="text-xs text-gray-600 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Core Values ───────────────────────────────────────── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#2D5A27]">Our Philosophy</span>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-3xl sm:text-4xl font-bold text-[#1A3C2A] mt-2">
+            What We Stand For
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {values.map((v) => (
+            <div key={v.title} className="bg-white p-8 rounded-2xl border border-emerald-950/10 shadow-xs hover:shadow-md transition-shadow">
+              <div className="w-8 h-1 bg-[#2D5A27] rounded-full mb-4" />
+              <h3 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-xl font-bold text-gray-900 mb-2">
+                {v.title}
+              </h3>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                {v.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
     </div>
   );
 };

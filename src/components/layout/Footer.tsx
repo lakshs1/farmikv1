@@ -1,82 +1,113 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Youtube } from "lucide-react";
-import farmikLogo from "@/assets/farmik-oils-logo.png";
+import { Facebook, Instagram, Youtube, Mail, Phone, MapPin, ShieldCheck, Truck, RefreshCw } from "lucide-react";
+import farmikLogo from "@/assets/farmik-logo.svg";
 
 export const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-muted border-t border-border mt-24">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+    <footer className="bg-[#15291C] text-gray-300 border-t border-emerald-900/40">
+      {/* Value Proposition Strip */}
+      <div className="border-b border-emerald-900/40 bg-[#1A3C2A]/60 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+          <div className="flex items-center justify-center md:justify-start gap-4">
+            <div className="p-3 bg-emerald-800/40 rounded-xl text-[#A3E0A3]">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div>
+              <h5 className="text-white font-semibold text-sm">100% Traditional Cold-Pressed</h5>
+              <p className="text-xs text-gray-400">Zero chemicals, zero solvent extraction</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-center md:justify-start gap-4">
+            <div className="p-3 bg-emerald-800/40 rounded-xl text-[#A3E0A3]">
+              <Truck className="w-6 h-6" />
+            </div>
+            <div>
+              <h5 className="text-white font-semibold text-sm">Fast Pan-India Shipping</h5>
+              <p className="text-xs text-gray-400">Direct from farm to your doorstep</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-center md:justify-start gap-4">
+            <div className="p-3 bg-emerald-800/40 rounded-xl text-[#A3E0A3]">
+              <RefreshCw className="w-6 h-6" />
+            </div>
+            <div>
+              <h5 className="text-white font-semibold text-sm">Quality Guaranteed</h5>
+              <p className="text-xs text-gray-400">Freshly churned in small, tested batches</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          {/* Brand */}
+      {/* Main Footer Links */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+          
+          {/* Brand Info */}
           <div className="md:col-span-5">
-            <Link to="/" className="inline-flex items-center gap-3 mb-6">
-              <img src={farmikLogo} alt="Farmik Oils" className="h-8 w-auto" />
-              <span
-                style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                className="text-xl font-medium text-foreground"
-              >
-                Farmik Oils
-              </span>
+            <Link to="/" className="inline-flex items-center gap-3 mb-5 group">
+              <img src={farmikLogo} alt="myfarmik logo" className="h-10 w-auto text-emerald-400" />
+              <div className="flex flex-col">
+                <span
+                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                  className="text-2xl font-bold tracking-tight text-white group-hover:text-emerald-400 transition-colors"
+                >
+                  myfarmik
+                </span>
+                <span className="text-[9px] uppercase tracking-[0.2em] font-semibold text-emerald-400/80 -mt-1">
+                  Purity to your kitchen
+                </span>
+              </div>
             </Link>
-            <p
-              className="text-sm text-muted-foreground max-w-sm leading-relaxed mb-8"
-              style={{ fontFamily: "'Inter', sans-serif" }}
-            >
-              Cold-pressed the traditional way. Pure mustard oil extracted without heat or chemicals —
-              preserving every nutrient, every drop of authentic flavour.
+
+            <p className="text-sm text-gray-400 max-w-sm leading-relaxed mb-6">
+              Cold-pressed the authentic way. Pure mustard oil extracted using traditional wooden churns —
+              preserving natural aroma, essential omega fatty acids, and uncompromised taste.
             </p>
-            <div className="flex items-center gap-5">
+
+            <div className="flex items-center gap-4">
               <a
                 href="#"
                 aria-label="Facebook"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="w-9 h-9 rounded-full bg-emerald-900/40 hover:bg-emerald-700/60 text-gray-300 hover:text-white flex items-center justify-center transition-all"
               >
                 <Facebook className="h-4 w-4" />
               </a>
               <a
                 href="#"
                 aria-label="Instagram"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="w-9 h-9 rounded-full bg-emerald-900/40 hover:bg-emerald-700/60 text-gray-300 hover:text-white flex items-center justify-center transition-all"
               >
                 <Instagram className="h-4 w-4" />
               </a>
               <a
                 href="#"
                 aria-label="YouTube"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="w-9 h-9 rounded-full bg-emerald-900/40 hover:bg-emerald-700/60 text-gray-300 hover:text-white flex items-center justify-center transition-all"
               >
                 <Youtube className="h-4 w-4" />
               </a>
             </div>
           </div>
 
-          {/* Spacer */}
-          <div className="hidden md:block md:col-span-1" />
-
-          {/* Pages */}
-          <div className="md:col-span-2">
-            <h4
-              className="text-xs uppercase tracking-widest text-foreground/50 mb-5"
-              style={{ fontFamily: "'Inter', sans-serif" }}
-            >
-              Pages
+          {/* Quick Links */}
+          <div className="md:col-span-3">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-5">
+              Quick Links
             </h4>
             <ul className="space-y-3">
               {[
-                { label: "Home", to: "/" },
-                { label: "Products", to: "/products" },
-                { label: "About", to: "/about" },
-                { label: "Blog", to: "/blog" },
-                { label: "Contact", to: "/contact" },
+                { label: "Shop Products", to: "/" },
+                { label: "About Us", to: "/about" },
+                { label: "Contact Us", to: "/contact" },
+                { label: "Privacy Policy", to: "/privacy-policy" },
+                { label: "Terms & Conditions", to: "/terms" },
               ].map((link) => (
                 <li key={link.to}>
                   <Link
                     to={link.to}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    style={{ fontFamily: "'Inter', sans-serif" }}
+                    className="text-sm text-gray-300 hover:text-emerald-400 transition-colors inline-block py-0.5"
                   >
                     {link.label}
                   </Link>
@@ -85,47 +116,45 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Contact Details */}
           <div className="md:col-span-4">
-            <h4
-              className="text-xs uppercase tracking-widest text-foreground/50 mb-5"
-              style={{ fontFamily: "'Inter', sans-serif" }}
-            >
-              Contact
+            <h4 className="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-5">
+              Get in Touch
             </h4>
-            <ul className="space-y-3 text-sm text-muted-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>
-              <li>
-                <a href="mailto:care@myfarmik.com" className="hover:text-foreground transition-colors">
+            <ul className="space-y-3.5 text-sm text-gray-300">
+              <li className="flex items-center gap-3">
+                <Mail className="h-4 w-4 text-emerald-400 shrink-0" />
+                <a href="mailto:care@myfarmik.com" className="hover:text-emerald-400 transition-colors">
                   care@myfarmik.com
                 </a>
               </li>
-              <li>
-                <a href="tel:08287317599" className="hover:text-foreground transition-colors">
+              <li className="flex items-center gap-3">
+                <Phone className="h-4 w-4 text-emerald-400 shrink-0" />
+                <a href="tel:08287317599" className="hover:text-emerald-400 transition-colors">
                   +91 82873 17599
                 </a>
               </li>
-              <li className="text-muted-foreground/80 leading-relaxed">
-                B-4, Block B, Sector 60<br />
-                Noida, Uttar Pradesh 201309
+              <li className="flex items-start gap-3">
+                <MapPin className="h-4 w-4 text-emerald-400 shrink-0 mt-1" />
+                <span className="text-gray-400 leading-relaxed">
+                  B-4, Block B, Sector 60<br />
+                  Noida, Uttar Pradesh 201309
+                </span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-border mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p
-            className="text-xs text-muted-foreground"
-            style={{ fontFamily: "'Inter', sans-serif" }}
-          >
-            © {year} Farmik Oils. All rights reserved.
-          </p>
-          <div
-            className="flex items-center gap-6 text-xs text-muted-foreground"
-            style={{ fontFamily: "'Inter', sans-serif" }}
-          >
-            <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-foreground transition-colors">Terms</a>
+        {/* Bottom copyright and legal links */}
+        <div className="border-t border-emerald-900/40 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
+          <p>© {year} myfarmik. All rights reserved.</p>
+          <div className="flex items-center gap-6">
+            <Link to="/privacy-policy" className="hover:text-emerald-400 transition-colors">
+              Privacy Policy
+            </Link>
+            <Link to="/terms" className="hover:text-emerald-400 transition-colors">
+              Terms & Conditions
+            </Link>
           </div>
         </div>
       </div>

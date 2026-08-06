@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 340" fill="none">
+  <!-- Tractor & Cultivator Line Art -->
+  <g stroke="#2D5A27" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Front Wheel -->
+    <circle cx="165" cy="148" r="17" stroke-width="4.5" />
+    <circle cx="165" cy="148" r="5" fill="#2D5A27" />
+    
+    <!-- Rear Wheel -->
+    <circle cx="265" cy="132" r="37" stroke-width="5" />
+    <circle cx="265" cy="132" r="25" stroke-width="3" />
+    <circle cx="265" cy="132" r="9" fill="#2D5A27" />
+    
+    <!-- Hood & Engine Chassis -->
+    <path d="M 155 148 L 155 102 C 155 96, 160 90, 170 90 L 235 90 L 246 132" stroke-width="4" />
+    <path d="M 155 115 L 155 138" stroke-width="3" />
+
+    <!-- Steering Wheel & Column -->
+    <path d="M 235 90 L 250 68" stroke-width="3.5" />
+    <ellipse cx="253" cy="64" rx="13" ry="4.5" transform="rotate(-18 253 64)" stroke-width="4" />
+    
+    <!-- Driver Seat -->
+    <path d="M 270 90 C 264 80, 274 72, 281 72 L 284 90 Z" stroke-width="3.5" />
+    
+    <!-- Exhaust Stack -->
+    <path d="M 185 90 L 185 48 M 181 48 L 189 48" stroke-width="3.5" />
+    
+    <!-- Rear Hitch Drawbar & Cultivator Attachment -->
+    <path d="M 295 132 L 388 146 L 430 146" stroke-width="4" />
+    <path d="M 368 143 L 388 114 M 388 114 L 428 114 L 428 152" stroke-width="3.5" />
+    <circle cx="392" cy="152" r="7.5" stroke-width="3" />
+
+    <!-- Cultivator Blades / Tines -->
+    <path d="M 398 146 L 403 166 C 405 171, 400 174, 395 171" stroke-width="3.5" />
+    <path d="M 416 146 L 421 166 C 423 171, 418 174, 413 171" stroke-width="3.5" />
+    <path d="M 432 146 L 437 166 C 439 171, 434 174, 429 171" stroke-width="3.5" />
+  </g>
+
+  <!-- Typography -->
+  <text x="300" y="248" text-anchor="middle" fill="#2D5A27" font-family="'Cormorant Garamond', 'Playfair Display', Georgia, serif" font-size="62" font-weight="600" letter-spacing="18">FARMIK</text>
+  <text x="300" y="292" text-anchor="middle" fill="#2D5A27" font-family="'Inter', system-ui, sans-serif" font-size="17" font-weight="600" letter-spacing="8">PURITY TO YOUR KITCHEN</text>
+</svg>

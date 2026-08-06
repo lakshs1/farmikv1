@@ -7,18 +7,17 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
 import Auth from "./pages/Auth";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
-import BlogList from "./pages/BlogList";
-import BlogDetail from "./pages/BlogDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,24 +30,34 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <CartProvider>
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col font-sans bg-[#FAF9F5]">
               <Header />
               <main className="flex-1">
                 <Routes>
-                  <Route path="/" element={<Index />} />
+                  {/* Default landing page is the Product Catalog Page */}
+                  <Route path="/" element={<Products />} />
+                  <Route path="/shop" element={<Products />} />
                   <Route path="/products" element={<Products />} />
                   <Route path="/products/:id" element={<ProductDetail />} />
+                  
+                  {/* Primary Navigation Pages */}
                   <Route path="/about" element={<About />} />
                   <Route path="/contact" element={<Contact />} />
-                  <Route path="/auth" element={<Auth />} />
+                  
+                  {/* Legal Pages */}
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsAndConditions />} />
+                  
+                  {/* User Account & Cart */}
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/auth" element={<Auth />} />
+                  
+                  {/* Admin Portal */}
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                  <Route path="/blog" element={<BlogList />} />
-                  <Route path="/blog/category/:categorySlug" element={<BlogList />} />
-                  <Route path="/blog/:slug" element={<BlogDetail />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  
+                  {/* Catch-all 404 */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>
