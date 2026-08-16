@@ -72,8 +72,8 @@ export const Header = () => {
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-emerald-950/10 py-3"
-            : "bg-[#FAF9F5]/90 backdrop-blur-md border-b border-emerald-950/5 py-4"
+            ? "bg-white shadow-sm border-b border-emerald-950/10 py-3"
+            : "bg-white border-b border-emerald-950/5 py-4"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

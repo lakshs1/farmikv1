@@ -133,6 +133,22 @@ const AdminDashboard = () => {
         return;
       }
 
+      // Automatically sync admin role if logged in with Supabase auth session
+      if (session?.user) {
+        const { error: roleError } = await supabase
+          .from('profiles')
+          .upsert({
+            user_id: session.user.id,
+            email: sessionEmail,
+            role: 'admin',
+            full_name: session.user.user_metadata?.full_name || 'Admin'
+          }, { onConflict: 'user_id' });
+
+        if (roleError) {
+          console.error("Failed to auto-sync admin role in profile:", roleError);
+        }
+      }
+
       await Promise.all([fetchProducts(), fetchCustomers(), fetchOrders(), fetchContactMessages()]);
     } catch (err) {
       console.error("Auth check failed:", err);
@@ -251,7 +267,7 @@ const AdminDashboard = () => {
   const handleSaveEdit = async () => {
     if (!editingProduct) return;
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('products')
         .update({
           name: editingProduct.name,
@@ -262,9 +278,14 @@ const AdminDashboard = () => {
           category: editingProduct.category,
           is_active: editingProduct.is_active,
         })
-        .eq('id', editingProduct.id);
+        .eq('id', editingProduct.id)
+        .select();
 
       if (error) throw error;
+
+      if (!data || data.length === 0) {
+        throw new Error("Updates denied. Your admin session does not have database write permission (RLS). Please log out and log back in to sync permissions.");
+      }
 
       setProducts(prev => prev.map(p => p.id === editingProduct.id ? editingProduct : p));
       setIsEditDialogOpen(false);
@@ -309,12 +330,17 @@ const AdminDashboard = () => {
 
   const toggleProductStatus = async (productId: string, currentStatus: boolean) => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('products')
         .update({ is_active: !currentStatus })
-        .eq('id', productId);
+        .eq('id', productId)
+        .select();
 
       if (error) throw error;
+
+      if (!data || data.length === 0) {
+        throw new Error("Updates denied. Your admin session does not have database write permission (RLS). Please log out and log back in to sync permissions.");
+      }
 
       setProducts(prev => prev.map(p => 
         p.id === productId ? { ...p, is_active: !currentStatus } : p

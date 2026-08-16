@@ -49,6 +49,20 @@ const AdminLogin = () => {
       if (error) throw error;
 
       if (data.session) {
+        // Automatically set the profile role to 'admin' in profiles table to allow database write permissions
+        const { error: roleError } = await supabase
+          .from('profiles')
+          .upsert({
+            user_id: data.session.user.id,
+            email: cleanEmail,
+            role: 'admin',
+            full_name: data.session.user.user_metadata?.full_name || 'Admin'
+          }, { onConflict: 'user_id' });
+
+        if (roleError) {
+          console.error("Failed to update user role to admin:", roleError);
+        }
+
         localStorage.setItem("adminSession", JSON.stringify({
           isAdmin: true,
           email: cleanEmail,

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Youtube, Mail, Phone, MapPin, ShieldCheck, Truck, RefreshCw } from "lucide-react";
+import { Mail, Phone, MapPin, ShieldCheck, Truck, RefreshCw } from "lucide-react";
 import farmikLogo from "@/assets/logo-farmik.png";
 
 export const Footer = () => {
@@ -65,30 +65,6 @@ export const Footer = () => {
               Cold-pressed the authentic way. Pure mustard oil extracted using traditional wooden churns —
               preserving natural aroma, essential omega fatty acids, and uncompromised taste.
             </p>
-
-            <div className="flex items-center gap-4">
-              <a
-                href="#"
-                aria-label="Facebook"
-                className="w-9 h-9 rounded-full bg-emerald-900/40 hover:bg-emerald-700/60 text-gray-300 hover:text-white flex items-center justify-center transition-all"
-              >
-                <Facebook className="h-4 w-4" />
-              </a>
-              <a
-                href="#"
-                aria-label="Instagram"
-                className="w-9 h-9 rounded-full bg-emerald-900/40 hover:bg-emerald-700/60 text-gray-300 hover:text-white flex items-center justify-center transition-all"
-              >
-                <Instagram className="h-4 w-4" />
-              </a>
-              <a
-                href="#"
-                aria-label="YouTube"
-                className="w-9 h-9 rounded-full bg-emerald-900/40 hover:bg-emerald-700/60 text-gray-300 hover:text-white flex items-center justify-center transition-all"
-              >
-                <Youtube className="h-4 w-4" />
-              </a>
-            </div>
           </div>
 
           {/* Quick Links */}

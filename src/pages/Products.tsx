@@ -107,8 +107,6 @@ const FALLBACK_PRODUCTS: Product[] = [
   }
 ];
 
-const CATEGORIES = ["All", "Mustard Oil", "Specialty Oils", "Groundnut Oil", "Gift Sets"];
-
 const SORT_OPTIONS = [
   { label: "Featured", value: "featured" },
   { label: "Price: Low to High", value: "price-low" },
@@ -120,7 +118,6 @@ const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("featured");
   const [sortOpen, setSortOpen] = useState(false);
   const [addedIds, setAddedIds] = useState<Record<string, boolean>>({});
@@ -149,7 +146,7 @@ const Products = () => {
         // Merge fallback styling fields if missing
         const enhanced = data.map((p, idx) => ({
           ...p,
-          rating: 4.8 + (idx % 3) * 0.1,
+          rating: Number((4.8 + (idx % 3) * 0.1).toFixed(2)),
           weight: p.description?.includes("5L") ? "5 Litre Canister" : "1 Litre Bottle",
           badge: idx === 0 ? "Best Seller" : idx === 1 ? "100% Pure" : "Cold-Pressed"
         }));
@@ -166,9 +163,7 @@ const Products = () => {
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || p.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
 
   const sorted = [...filtered].sort((a, b) => {
@@ -194,45 +189,47 @@ const Products = () => {
     <div className="min-h-screen bg-[#FAF9F5] text-gray-800">
       
       {/* ── Landing Hero Banner ─────────────────────────────────── */}
-      <section ref={heroRef} className="relative bg-[#1A3C2A] text-white pt-24 pb-20 overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#A3E0A3_1px,transparent_1px)] [background-size:16px_16px]" />
+      <section ref={heroRef} className="relative bg-gradient-to-br from-[#102A1C] to-[#1A3C2A] text-white pt-16 pb-12 overflow-hidden shadow-inner border-b border-emerald-900/30">
+        {/* Subtle background pattern/glow */}
+        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#58D68D_1px,transparent_1px)] [background-size:20px_20px]" />
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-emerald-300/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-800/80 border border-emerald-500/30 text-emerald-200 text-xs font-semibold uppercase tracking-wider mb-6">
-              <Sparkles className="w-3.5 h-3.5 text-[#A3E0A3]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-900/60 border border-emerald-500/20 text-emerald-200 text-[10px] font-bold uppercase tracking-wider mb-4 animate-pulse">
+              <Sparkles className="w-3 h-3 text-emerald-300" />
               <span>100% Traditional Wooden Churn (Kachi Ghani)</span>
             </div>
 
             <h1
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
-              className="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-tight mb-6"
+              className="text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight mb-3"
             >
               Pure Cold-Pressed Oils, <br />
               <span className="italic text-emerald-300 font-normal">Direct from Farm to Kitchen.</span>
             </h1>
 
-            <p className="text-emerald-100/90 text-base sm:text-lg font-light leading-relaxed mb-8 max-w-2xl">
+            <p className="text-emerald-100/80 text-sm sm:text-base font-light leading-relaxed mb-6 max-w-2xl">
               Zero heat. Zero chemicals. Pressed at room temperature using age-old wooden churns to preserve every nutrient, natural antioxidant, and rich authentic taste.
             </p>
 
             {/* Feature Pills */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-emerald-100">
-              <div className="flex items-center gap-2 bg-emerald-900/50 p-2.5 rounded-lg border border-emerald-700/40">
-                <ShieldCheck className="w-4 h-4 text-emerald-300 shrink-0" />
+            <div className="flex flex-wrap gap-2 text-[11px] text-emerald-100/90">
+              <div className="flex items-center gap-1.5 bg-emerald-950/40 px-3 py-1.5 rounded-full border border-emerald-800/30 backdrop-blur-xs">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
                 <span>Lab Certified Pure</span>
               </div>
-              <div className="flex items-center gap-2 bg-emerald-900/50 p-2.5 rounded-lg border border-emerald-700/40">
-                <Award className="w-4 h-4 text-emerald-300 shrink-0" />
+              <div className="flex items-center gap-1.5 bg-emerald-950/40 px-3 py-1.5 rounded-full border border-emerald-800/30 backdrop-blur-xs">
+                <Award className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
                 <span>Zero Solvents</span>
               </div>
-              <div className="flex items-center gap-2 bg-emerald-900/50 p-2.5 rounded-lg border border-emerald-700/40">
-                <Heart className="w-4 h-4 text-emerald-300 shrink-0" />
+              <div className="flex items-center gap-1.5 bg-emerald-950/40 px-3 py-1.5 rounded-full border border-emerald-800/30 backdrop-blur-xs">
+                <Heart className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
                 <span>Heart Healthy Omega-3</span>
               </div>
-              <div className="flex items-center gap-2 bg-emerald-900/50 p-2.5 rounded-lg border border-emerald-700/40">
-                <Sparkles className="w-4 h-4 text-emerald-300 shrink-0" />
+              <div className="flex items-center gap-1.5 bg-emerald-950/40 px-3 py-1.5 rounded-full border border-emerald-800/30 backdrop-blur-xs">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
                 <span>Fresh Small Batches</span>
               </div>
             </div>
@@ -243,29 +240,16 @@ const Products = () => {
       {/* ── Catalog Filter & Search Section ────────────────────────── */}
       <section className="sticky top-[68px] z-40 bg-white/95 backdrop-blur-md border-b border-emerald-950/10 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             
-            {/* Category Tabs */}
-            <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-                    selectedCategory === cat
-                      ? "bg-[#1A3C2A] text-white shadow-sm"
-                      : "bg-emerald-50/60 text-gray-700 hover:bg-emerald-100/60"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-2xl font-bold text-[#1A3C2A] hidden sm:block">
+              Organic Selection
+            </h2>
 
             {/* Search & Sort Actions */}
-            <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
               {/* Search input */}
-              <div className="relative flex-1 md:w-64">
+              <div className="relative flex-1 sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="search"
@@ -337,10 +321,10 @@ const Products = () => {
               No products found matching your search.
             </p>
             <button
-              onClick={() => { setSearchQuery(""); setSelectedCategory("All"); }}
+              onClick={() => setSearchQuery("")}
               className="mt-4 px-4 py-2 bg-[#1A3C2A] text-white text-xs font-semibold rounded-lg"
             >
-              Reset Filters
+              Reset Search
             </button>
           </div>
         ) : (
@@ -365,11 +349,11 @@ const Products = () => {
                       {product.badge}
                     </span>
                   )}
-
+ 
                   {/* Rating Badge */}
                   <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-bold text-gray-800 flex items-center gap-1 shadow-xs">
                     <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    <span>{product.rating || 4.9}</span>
+                    <span>{Number(product.rating || 4.9).toFixed(2)}</span>
                   </div>
                 </div>
 

@@ -60,7 +60,6 @@ const About = () => {
       <section className="relative bg-[#1A3C2A] text-white py-20 px-4 sm:px-6 lg:px-8 overflow-hidden mb-16">
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-800/80 border border-emerald-500/30 text-emerald-200 text-xs font-semibold uppercase tracking-wider mb-6">
-            <img src={farmikLogo} alt="myfarmik" className="h-6 w-auto" />
             <span>The myfarmik Story</span>
           </div>
 
@@ -115,7 +114,6 @@ const About = () => {
           </div>
 
           <div className="relative bg-white p-8 rounded-3xl border border-emerald-950/10 shadow-lg text-center space-y-6">
-            <img src={farmikLogo} alt="myfarmik emblem" className="h-20 w-auto mx-auto" />
             <h3 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-2xl font-bold text-gray-900">
               "Purity is not a feature — it's our promise."
             </h3>
