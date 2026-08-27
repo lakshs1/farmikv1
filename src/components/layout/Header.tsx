@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, X, Search, Menu, Leaf } from "lucide-react";
+import { ShoppingCart, User, X, Search, Menu } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import farmikLogo from "@/assets/logo-farmik.png";
@@ -65,14 +65,6 @@ export const Header = () => {
 
   return (
     <>
-      {/* Top Banner (Hidden on homepage to allow full-screen cinematic immersion) */}
-      {!isHome && (
-        <div className="bg-[#1A3C2A] text-[#E8F3E8] text-xs font-medium py-2 px-4 text-center tracking-wider flex items-center justify-center gap-2">
-          <Leaf className="w-3.5 h-3.5 text-[#A3E0A3] animate-pulse" />
-          <span>100% Pure Traditional Cold-Pressed Oils — Free Shipping on Orders Over ₹499</span>
-        </div>
-      )}
-
       <header
         className={`${isHome ? "fixed" : "sticky"} top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isHome
@@ -80,8 +72,8 @@ export const Header = () => {
               ? "bg-[#0B0A08]/85 backdrop-blur-md border-b border-white/5 py-3 shadow-lg shadow-black/40"
               : "bg-transparent border-b border-transparent py-4"
             : scrolled
-              ? "bg-white shadow-sm border-b border-emerald-950/10 py-3"
-              : "bg-white border-b border-emerald-950/5 py-4"
+              ? "bg-[#FAF9F5]/90 backdrop-blur-md border-b border-[#1A3C2A]/10 py-3 shadow-xs"
+              : "bg-[#FAF9F5]/40 backdrop-blur-xs border-b border-[#1A3C2A]/5 py-4"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -92,10 +84,8 @@ export const Header = () => {
               <div className="h-10 w-auto flex items-center justify-center">
                 <img
                   src={farmikLogo}
-                  alt="myfarmik logo"
-                  className={`h-10 w-auto transition-transform duration-300 group-hover:scale-105 ${
-                    isHome ? "brightness-200" : "text-[#2D5A27]"
-                  }`}
+                  alt="FARMIK logo"
+                  className="h-10 w-auto transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
               <div className="flex flex-col">
@@ -105,10 +95,10 @@ export const Header = () => {
                     isHome ? "text-white/95" : "text-[#1A3C2A] group-hover:text-[#2D5A27]"
                   }`}
                 >
-                  myfarmik
+                  FARMIK
                 </span>
                 <span className={`text-[9px] uppercase tracking-[0.2em] font-semibold -mt-1 ${
-                  isHome ? "text-white/40" : "text-[#5A7A5A]"
+                  isHome ? "text-white/40" : "text-[#1A3C2A]/50"
                 }`}>
                   Purity to your kitchen
                 </span>
@@ -127,15 +117,15 @@ export const Header = () => {
                         ? "text-white font-semibold"
                         : "text-white/70 hover:text-white"
                       : isActive(link.to)
-                        ? "text-[#2D5A27] font-semibold"
-                        : "text-gray-700 hover:text-[#2D5A27]"
+                        ? "text-[#1A3C2A] font-semibold"
+                        : "text-[#1A3C2A]/70 hover:text-[#1A3C2A]"
                   }`}
                   style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                 >
                   {link.label}
                   {isActive(link.to) && (
                     <span className={`absolute bottom-0 left-0 right-0 h-0.5 rounded-full animate-fadeIn ${
-                      isHome ? "bg-[#C89B3C]" : "bg-[#2D5A27]"
+                      isHome ? "bg-[#C89B3C]" : "bg-[#1A3C2A]"
                     }`} />
                   )}
                 </Link>
@@ -151,7 +141,7 @@ export const Header = () => {
                 className={`p-2.5 rounded-full transition-all ${
                   isHome
                     ? "text-white/70 hover:text-white hover:bg-white/10"
-                    : "text-gray-700 hover:text-[#2D5A27] hover:bg-emerald-50/60"
+                    : "text-[#1A3C2A]/70 hover:text-[#1A3C2A] hover:bg-[#1A3C2A]/5"
                 }`}
               >
                 <Search className="h-5 w-5" />
@@ -163,14 +153,14 @@ export const Header = () => {
                 className={`relative p-2.5 rounded-full transition-all ${
                   isHome
                     ? "text-white/70 hover:text-white hover:bg-white/10"
-                    : "text-gray-700 hover:text-[#2D5A27] hover:bg-emerald-50/60"
+                    : "text-[#1A3C2A]/70 hover:text-[#1A3C2A] hover:bg-[#1A3C2A]/5"
                 }`}
                 aria-label="Shopping Cart"
               >
                 <ShoppingCart className="h-5 w-5" />
                 {cartItemCount > 0 && (
                   <span className={`absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full text-xs font-bold flex items-center justify-center shadow-sm ${
-                    isHome ? "bg-[#C89B3C] text-black" : "bg-[#2D5A27] text-white"
+                    isHome ? "bg-[#C89B3C] text-black" : "bg-[#1A3C2A] text-white"
                   }`}>
                     {cartItemCount}
                   </span>
@@ -180,14 +170,14 @@ export const Header = () => {
               {/* User Profile / Auth */}
               {user ? (
                 <div className={`hidden md:flex items-center gap-2 border-l pl-3 ml-1 ${
-                  isHome ? "border-white/10" : "border-emerald-950/10"
+                  isHome ? "border-white/10" : "border-[#1A3C2A]/10"
                 }`}>
                   <Link
                     to="/profile"
                     className={`p-2.5 rounded-full transition-all flex items-center gap-2 ${
                       isHome
                         ? "text-white/70 hover:text-white hover:bg-white/10"
-                        : "text-gray-700 hover:text-[#2D5A27] hover:bg-emerald-50/60"
+                        : "text-[#1A3C2A]/70 hover:text-[#1A3C2A] hover:bg-[#1A3C2A]/5"
                     }`}
                     title="Profile"
                   >
@@ -196,7 +186,7 @@ export const Header = () => {
                   <button
                     onClick={signOut}
                     className={`text-xs font-semibold px-2 py-1 rounded transition-colors ${
-                      isHome ? "text-white/60 hover:text-[#C89B3C]" : "text-gray-600 hover:text-red-700"
+                      isHome ? "text-white/60 hover:text-[#C89B3C]" : "text-[#1A3C2A]/60 hover:text-red-700"
                     }`}
                   >
                     Sign Out
@@ -218,7 +208,7 @@ export const Header = () => {
               {/* Mobile Menu Hamburger */}
               <button
                 className={`md:hidden p-2.5 rounded-lg ${
-                  isHome ? "text-white/80 hover:bg-white/10" : "text-gray-700 hover:bg-emerald-50"
+                  isHome ? "text-white/80 hover:bg-white/10" : "text-[#1A3C2A]/80 hover:bg-[#1A3C2A]/5"
                 }`}
                 onClick={() => setDrawerOpen(true)}
                 aria-label="Open navigation menu"
@@ -234,7 +224,7 @@ export const Header = () => {
           <div className={`border-t px-4 py-3 shadow-md animate-fadeIn ${
             isHome
               ? "border-white/10 bg-[#0B0A08]/95 backdrop-blur-lg"
-              : "border-emerald-950/10 bg-white/95 backdrop-blur-lg"
+              : "border-[#1A3C2A]/10 bg-[#FAF9F5]/95 backdrop-blur-lg"
           }`}>
             <form onSubmit={handleSearch} className="max-w-3xl mx-auto flex items-center gap-3">
               <Search className="h-5 w-5 text-gray-400 shrink-0" />
@@ -245,7 +235,7 @@ export const Header = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`flex-1 bg-transparent text-sm outline-none py-1 ${
-                  isHome ? "text-white placeholder:text-white/30" : "text-gray-900 placeholder:text-gray-400"
+                  isHome ? "text-white placeholder:text-white/30" : "text-[#1A3C2A] placeholder:text-[#1A3C2A]/30"
                 }`}
               />
               <button
@@ -268,27 +258,29 @@ export const Header = () => {
             onClick={() => setDrawerOpen(false)}
           />
           <div className={`relative w-4/5 max-w-xs h-full shadow-2xl z-10 flex flex-col p-6 overflow-y-auto ${
-            isHome ? "bg-[#0B0A08] text-white border-l border-white/5" : "bg-white text-gray-800"
+            isHome ? "bg-[#0B0A08] text-white border-l border-white/5" : "bg-[#FAF9F5] text-[#1A3C2A] border-l border-[#1A3C2A]/5"
           }`}>
             <div className={`flex items-center justify-between pb-6 border-b ${
-              isHome ? "border-white/5" : "border-gray-100"
+              isHome ? "border-white/5" : "border-[#1A3C2A]/5"
             }`}>
               <div className="flex items-center gap-2">
                 <img
                   src={farmikLogo}
-                  alt="myfarmik"
-                  className={`h-8 w-auto ${isHome ? "brightness-200" : "text-[#2D5A27]"}`}
+                  alt="FARMIK"
+                  className="h-8 w-auto"
                 />
                 <span
                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
                   className={`text-2xl font-bold ${isHome ? "text-white/95" : "text-[#1A3C2A]"}`}
                 >
-                  myfarmik
+                  FARMIK
                 </span>
               </div>
               <button
                 onClick={() => setDrawerOpen(false)}
-                className={`p-2 transition-colors ${isHome ? "text-white/50 hover:text-white" : "text-gray-500 hover:text-gray-800"}`}
+                className={`p-2 transition-colors ${
+                  isHome ? "text-white/55 hover:text-white" : "text-[#1A3C2A]/55 hover:text-[#1A3C2A]"
+                }`}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -304,10 +296,10 @@ export const Header = () => {
                     isActive(link.to)
                       ? isHome
                         ? "bg-white/10 text-white font-semibold"
-                        : "bg-emerald-50 text-[#2D5A27] font-semibold"
+                        : "bg-[#1A3C2A]/10 text-[#1A3C2A] font-semibold"
                       : isHome
                         ? "text-white/70 hover:bg-white/5"
-                        : "text-gray-700 hover:bg-gray-50"
+                        : "text-[#1A3C2A]/70 hover:bg-[#1A3C2A]/5"
                   }`}
                 >
                   {link.label}
@@ -316,7 +308,7 @@ export const Header = () => {
             </nav>
 
             <div className={`mt-auto pt-6 border-t flex flex-col gap-3 ${
-              isHome ? "border-white/5" : "border-gray-100"
+              isHome ? "border-white/5" : "border-[#1A3C2A]/5"
             }`}>
               {user ? (
                 <>
@@ -324,7 +316,7 @@ export const Header = () => {
                     to="/profile"
                     onClick={() => setDrawerOpen(false)}
                     className={`flex items-center gap-3 py-2.5 px-4 rounded-lg ${
-                      isHome ? "text-white/70 hover:bg-white/5" : "text-gray-700 hover:bg-emerald-50"
+                      isHome ? "text-white/70 hover:bg-white/5" : "text-[#1A3C2A]/70 hover:bg-[#1A3C2A]/5"
                     }`}
                   >
                     <User className="h-5 w-5" />
@@ -333,7 +325,7 @@ export const Header = () => {
                   <button
                     onClick={() => { signOut(); setDrawerOpen(false); }}
                     className={`text-left text-sm font-semibold px-4 py-2 rounded-lg ${
-                      isHome ? "text-white/55 hover:bg-red-950/20 text-red-400" : "text-red-600 hover:bg-red-50"
+                      isHome ? "text-red-400 hover:bg-red-950/20" : "text-red-600 hover:bg-red-50"
                     }`}
                   >
                     Sign Out

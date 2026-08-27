@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const faqs = [
   {
-    q: "What makes myfarmik mustard oil pure and authentic?",
+    q: "What makes FARMIK mustard oil pure and authentic?",
     a: "Our oil is extracted using traditional wooden churners (Kachi Ghani) below 45°C. No external heat or chemical solvents are ever added, preserving the natural Omega-3, vitamins, and pungent mustard aroma.",
   },
   {
@@ -62,7 +62,7 @@ const Contact = () => {
       setSending(false);
       toast({
         title: "Message Sent Successfully! 📩",
-        description: "Thank you for reaching out to myfarmik. Our team will get back to you within 24 hours.",
+        description: "Thank you for reaching out to FARMIK. Our team will get back to you within 24 hours.",
       });
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
     }
@@ -75,11 +75,11 @@ const Contact = () => {
       <div className="bg-[#1A3C2A] text-white py-16 px-4 sm:px-6 lg:px-8 mb-12 shadow-sm">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-800/80 border border-emerald-500/30 text-emerald-200 text-xs font-semibold uppercase tracking-wider mb-4">
-            <img src={farmikLogo} alt="myfarmik" className="h-5 w-auto" />
+            <img src={farmikLogo} alt="FARMIK" className="h-5 w-auto" />
             <span>We're Here to Help</span>
           </div>
           <h1 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-4">
-            Contact myfarmik Support
+            Contact FARMIK Support
           </h1>
           <p className="text-emerald-100/90 text-sm max-w-xl mx-auto font-light leading-relaxed">
             Have questions about our cold-pressed oils, order delivery, or bulk business orders? Send us a message or call directly.
@@ -106,8 +106,8 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Email Us</p>
-                  <a href="mailto:care@myfarmik.com" className="text-base font-bold text-gray-900 hover:text-[#2D5A27] transition-colors">
-                    care@myfarmik.com
+                  <a href="mailto:care@farmik.com" className="text-base font-bold text-gray-900 hover:text-[#2D5A27] transition-colors">
+                    care@farmik.com
                   </a>
                   <p className="text-xs text-gray-500">Fast response within 24 hours</p>
                 </div>

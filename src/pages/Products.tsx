@@ -93,7 +93,7 @@ const FALLBACK_PRODUCTS: Product[] = [
   },
   {
     id: "f6",
-    name: "myfarmik Trio Purity Gift Box",
+    name: "FARMIK Trio Purity Gift Box",
     description: "A signature curated set featuring 1L Cold-Pressed Mustard Oil, 500ml Sesame Oil, and 1L Groundnut Oil in gift packaging.",
     price: 1199,
     original_price: 1469,
@@ -432,13 +432,13 @@ const Products = () => {
         )}
       </section>
 
-      {/* ── Why myfarmik Section ───────────────────────────────────── */}
+      {/* ── Why FARMIK Section ───────────────────────────────────── */}
       <section className="bg-white py-16 border-t border-emerald-950/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs font-bold uppercase tracking-widest text-[#2D5A27]">Uncompromising Quality</span>
             <h2 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-3xl sm:text-4xl font-bold text-[#1A3C2A] mt-2">
-              Why Chefs & Families Choose myfarmik
+              Why Chefs & Families Choose FARMIK
             </h2>
           </div>
 
