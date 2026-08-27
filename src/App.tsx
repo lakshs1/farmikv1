@@ -60,7 +60,9 @@ const LayoutContainer = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      {!isHome && <Footer />}
+      <div className={isHome ? "relative z-30" : ""}>
+        <Footer />
+      </div>
     </div>
   );
 };

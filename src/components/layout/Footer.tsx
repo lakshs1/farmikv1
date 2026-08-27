@@ -47,13 +47,13 @@ export const Footer = () => {
           {/* Brand Info */}
           <div className="md:col-span-5">
             <Link to="/" className="inline-flex items-center gap-3 mb-5 group">
-              <img src={farmikLogo} alt="myfarmik logo" className="h-10 w-auto text-emerald-400" />
+              <img src={farmikLogo} alt="FARMIK logo" className="h-10 w-auto text-emerald-400" />
               <div className="flex flex-col">
                 <span
                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
                   className="text-2xl font-bold tracking-tight text-white group-hover:text-emerald-400 transition-colors"
                 >
-                  myfarmik
+                  FARMIK
                 </span>
                 <span className="text-[9px] uppercase tracking-[0.2em] font-semibold text-emerald-400/80 -mt-1">
                   Purity to your kitchen
@@ -123,7 +123,7 @@ export const Footer = () => {
 
         {/* Bottom copyright and legal links */}
         <div className="border-t border-emerald-900/40 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
-          <p>© {year} myfarmik. All rights reserved.</p>
+          <p>© {year} FARMIK. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link to="/privacy-policy" className="hover:text-emerald-400 transition-colors">
               Privacy Policy

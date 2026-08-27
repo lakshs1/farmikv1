@@ -440,10 +440,10 @@ const AdminDashboard = () => {
       <header className="border-b border-emerald-950/10 bg-white mb-8 shadow-xs">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={farmikLogo} alt="myfarmik logo" className="h-9 w-auto text-[#2D5A27]" />
+            <img src={farmikLogo} alt="FARMIK logo" className="h-9 w-auto text-[#2D5A27]" />
             <div>
               <h1 className="text-2xl font-bold text-[#1A3C2A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                myfarmik Admin Portal
+                FARMIK Admin Portal
               </h1>
               <p className="text-xs text-gray-500" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Managing products, orders, customers, and user contact enquiries

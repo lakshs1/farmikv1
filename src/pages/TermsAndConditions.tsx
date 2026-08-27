@@ -18,7 +18,7 @@ const TermsAndConditions = () => {
             Terms & Conditions
           </h1>
           <p className="text-emerald-100/90 text-sm max-w-xl mx-auto font-light">
-            Welcome to <strong className="font-semibold text-white">myfarmik</strong>. Please read these terms carefully before placing an order.
+            Welcome to <strong className="font-semibold text-white">FARMIK</strong>. Please read these terms carefully before placing an order.
           </p>
         </div>
       </div>
@@ -37,7 +37,7 @@ const TermsAndConditions = () => {
               <h2>1. General Acceptance</h2>
             </div>
             <p>
-              By accessing, browsing, or purchasing products on <strong className="text-gray-900">myfarmik</strong>, you agree to be bound by these Terms and Conditions, as well as our Privacy Policy.
+              By accessing, browsing, or purchasing products on <strong className="text-gray-900">FARMIK</strong>, you agree to be bound by these Terms and Conditions, as well as our Privacy Policy.
             </p>
           </section>
 
@@ -82,7 +82,7 @@ const TermsAndConditions = () => {
           <section className="space-y-3 border-t border-gray-100 pt-6">
             <h2 className="text-[#1A3C2A] font-bold text-lg">5. Governing Law</h2>
             <p>
-              These terms are governed by the laws of India. Any disputes arising in connection with orders placed on <strong className="text-gray-900">myfarmik</strong> shall be subject to the exclusive jurisdiction of the courts in Gautam Buddha Nagar / Noida, UP.
+              These terms are governed by the laws of India. Any disputes arising in connection with orders placed on <strong className="text-gray-900">FARMIK</strong> shall be subject to the exclusive jurisdiction of the courts in Gautam Buddha Nagar / Noida, UP.
             </p>
           </section>
 

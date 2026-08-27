@@ -108,12 +108,12 @@ const Auth = () => {
 
         {/* Logo */}
         <div className="flex items-center gap-3 mb-12">
-          <img src={farmikLogo} alt="myfarmik" className="h-8 w-auto" />
+          <img src={farmikLogo} alt="FARMIK" className="h-8 w-auto" />
           <span
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
             className="text-xl font-medium text-foreground"
           >
-            myfarmik
+            FARMIK
           </span>
         </div>
 

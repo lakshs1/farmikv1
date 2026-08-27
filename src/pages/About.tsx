@@ -8,7 +8,7 @@ import logoFarmik from "@/assets/logo-farmik.png";
    ═══════════════════════════════════════════════════════════════ */
 
 const TOTAL_FRAMES = 240;
-const SCROLL_HEIGHT_VH = 550; // Total scroll container height in vh units
+const SCROLL_HEIGHT_VH = 950; // Total scroll container height in vh units
 
 const ALLOWED_ADMINS = [
   "annupusa01@gmail.com",
@@ -25,7 +25,7 @@ const clamp = (v: number, min: number, max: number) =>
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-/** Calculate overlay opacity + translateY for a given scroll‑progress window */
+/** Calculate overlay opacity + translateY for a given scroll‑progress window with a stable reading plateau */
 const getBeatStyle = (
   progress: number,
   start: number,
@@ -34,13 +34,19 @@ const getBeatStyle = (
   if (progress < start) return { opacity: 0, y: 40 };
   if (progress > end) return { opacity: 0, y: -40 };
 
-  const mid = (start + end) / 2;
-  if (progress <= mid) {
-    const t = (progress - start) / (mid - start);
+  const range = end - start;
+  const fadeInEnd = start + range * 0.3; // 30% of range is fade in
+  const fadeOutStart = start + range * 0.7; // 40% is plateau, last 30% is fade out
+
+  if (progress < fadeInEnd) {
+    const t = (progress - start) / (fadeInEnd - start);
     return { opacity: t, y: 40 * (1 - t) };
+  } else if (progress > fadeOutStart) {
+    const t = (end - progress) / (end - fadeOutStart);
+    return { opacity: t, y: -40 * (1 - t) };
+  } else {
+    return { opacity: 1, y: 0 };
   }
-  const t = (end - progress) / (end - mid);
-  return { opacity: t, y: -40 * (1 - t) };
 };
 
 /** Draw an image onto a canvas with "object-fit: cover" behaviour */
@@ -233,7 +239,7 @@ const About = () => {
     const tick = () => {
       const frameDiff = targetFrame.current - currentFrame.current;
       if (Math.abs(frameDiff) > 0.05) {
-        currentFrame.current = lerp(currentFrame.current, targetFrame.current, 0.15);
+        currentFrame.current = lerp(currentFrame.current, targetFrame.current, 0.04);
       } else {
         currentFrame.current = targetFrame.current;
       }
@@ -329,11 +335,11 @@ const About = () => {
         <div className="text-center space-y-4 max-w-xs">
           <img
             src={logoFarmik}
-            alt="myfarmik"
-            className="h-16 w-auto mx-auto brightness-200 animate-pulse"
+            alt="FARMIK"
+            className="h-16 w-auto mx-auto animate-pulse"
           />
           <h2 className="text-sm uppercase tracking-[0.25em] text-white/90">
-            myfarmik
+            FARMIK
           </h2>
           <p className="text-[10px] uppercase tracking-widest text-[#C89B3C] font-semibold">
             Pure Cold-Pressed Journey
@@ -374,19 +380,21 @@ const About = () => {
           className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-20 pointer-events-none"
           style={{ willChange: "opacity, transform" }}
         >
-          <p className="text-xs uppercase tracking-[0.25em] text-[#C89B3C] font-semibold mb-3">
-            Pure Traditional Cold Press
-          </p>
-          <h1 className="text-4xl md:text-7xl font-bold tracking-tight text-white mb-6 uppercase">
-            myfarmik
-          </h1>
-          <p className="text-lg md:text-xl font-light text-white/70 max-w-md italic mb-4">
-            Nature, pressed with purpose.
-          </p>
-          <p className="text-xs md:text-sm text-white/50 max-w-lg leading-relaxed">
-            Cold-pressed from carefully selected seeds, filtered with care, and
-            bottled at its purest.
-          </p>
+          <div className="bg-black/40 backdrop-blur-md px-8 py-10 rounded-2xl border border-white/10 shadow-2xl max-w-xl text-center">
+            <p className="text-xs uppercase tracking-[0.25em] text-[#C89B3C] font-semibold mb-3">
+              Pure Traditional Cold Press
+            </p>
+            <h1 className="text-4xl md:text-7xl font-bold tracking-tight text-white mb-6 uppercase">
+              FARMIK
+            </h1>
+            <p className="text-lg md:text-xl font-light text-white/70 max-w-md italic mb-4">
+              Nature, pressed with purpose.
+            </p>
+            <p className="text-xs md:text-sm text-white/50 leading-relaxed">
+              Cold-pressed from carefully selected seeds, filtered with care, and
+              bottled at its purest.
+            </p>
+          </div>
         </div>
 
         {/* ── Beat 2: Cold Press  15%–40% ────────────────────── */}
@@ -395,8 +403,8 @@ const About = () => {
           className="absolute inset-0 flex flex-col justify-center text-left px-8 md:px-24 z-20 pointer-events-none"
           style={{ opacity: 0, willChange: "opacity, transform" }}
         >
-          <div className="max-w-xl">
-            <p className="text-xs uppercase tracking-[0.25em] text-[#6F7D45] font-semibold mb-3">
+          <div className="max-w-xl bg-black/40 backdrop-blur-md p-8 md:p-12 rounded-3xl border border-white/10 shadow-2xl text-left">
+            <p className="text-xs uppercase tracking-[0.25em] text-[#A3E0A3] font-semibold mb-3">
               The Extraction
             </p>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4 uppercase">
@@ -419,7 +427,7 @@ const About = () => {
           className="absolute inset-0 flex flex-col justify-center items-end text-right px-8 md:px-24 z-20 pointer-events-none"
           style={{ opacity: 0, willChange: "opacity, transform" }}
         >
-          <div className="max-w-xl">
+          <div className="max-w-xl bg-black/40 backdrop-blur-md p-8 md:p-12 rounded-3xl border border-white/10 shadow-2xl text-right">
             <p className="text-xs uppercase tracking-[0.25em] text-[#C89B3C] font-semibold mb-3">
               Pure Clarification
             </p>
@@ -430,7 +438,7 @@ const About = () => {
               Careful filtration removes suspended particles while preserving
               the oil's natural character, aroma, sharp taste, and golden color.
             </p>
-            <p className="text-xs text-[#6F7D45] font-medium uppercase tracking-wider">
+            <p className="text-xs text-[#A3E0A3] font-medium uppercase tracking-wider">
               Clean process. Honest oil.
             </p>
           </div>
@@ -442,8 +450,8 @@ const About = () => {
           className="absolute inset-0 flex flex-col justify-center text-left px-8 md:px-24 z-20 pointer-events-none"
           style={{ opacity: 0, willChange: "opacity, transform" }}
         >
-          <div className="max-w-xl">
-            <p className="text-xs uppercase tracking-[0.25em] text-[#6F7D45] font-semibold mb-3">
+          <div className="max-w-xl bg-black/40 backdrop-blur-md p-8 md:p-12 rounded-3xl border border-white/10 shadow-2xl text-left">
+            <p className="text-xs uppercase tracking-[0.25em] text-[#A3E0A3] font-semibold mb-3">
               Precise Packaging
             </p>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4 uppercase">
@@ -465,45 +473,46 @@ const About = () => {
           className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-20 pointer-events-none"
           style={{ opacity: 0, willChange: "opacity, transform" }}
         >
-          <p className="text-xs uppercase tracking-[0.25em] text-[#C89B3C] font-semibold mb-3">
-            Your Premium Choice
-          </p>
-          <h2 className="text-3xl md:text-6xl font-bold tracking-tight text-white mb-4 uppercase">
-            Purely made.
-            <br />
-            Naturally yours.
-          </h2>
-          <p className="text-sm md:text-base text-white/65 max-w-md mb-8">
-            Cold-pressed oils made with care, from seed to bottle. Bring health
-            back to your kitchen.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 pointer-events-auto">
-            <Link
-              to="/products"
-              className="px-8 py-3 bg-[#C89B3C] text-black font-semibold text-xs tracking-widest uppercase hover:bg-[#E6C56A] transition-colors rounded-full shadow-lg"
-            >
-              Explore Our Oils
-            </Link>
-            <button
-              onClick={() => scrollToBeat(0)}
-              className="px-8 py-3 border border-white/20 text-white font-semibold text-xs tracking-widest uppercase hover:bg-white/10 transition-all rounded-full"
-            >
-              Our Process
-            </button>
+          <div className="bg-black/40 backdrop-blur-md px-8 py-12 rounded-3xl border border-white/10 shadow-2xl max-w-xl text-center">
+            <p className="text-xs uppercase tracking-[0.25em] text-[#C89B3C] font-semibold mb-3">
+              Your Premium Choice
+            </p>
+            <h2 className="text-3xl md:text-6xl font-bold tracking-tight text-white mb-4 uppercase">
+              Purely made.
+              <br />
+              Naturally yours.
+            </h2>
+            <p className="text-sm md:text-base text-white/65 mb-8">
+              Cold-pressed oils made with care, from seed to bottle. Bring health
+              back to your kitchen.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pointer-events-auto">
+              <Link
+                to="/products"
+                className="px-8 py-3 bg-[#C89B3C] text-black font-semibold text-xs tracking-widest uppercase hover:bg-[#E6C56A] transition-colors rounded-full shadow-lg"
+              >
+                Explore Our Oils
+              </Link>
+              <button
+                onClick={() => scrollToBeat(0)}
+                className="px-8 py-3 border border-white/20 text-white font-semibold text-xs tracking-widest uppercase hover:bg-white/10 transition-all rounded-full"
+              >
+                Our Process
+              </button>
+            </div>
+            <p className="text-[10px] text-white/35 mt-8 tracking-wider">
+              Know what goes into every drop.
+            </p>
           </div>
-          <p className="text-[10px] text-white/35 mt-8 tracking-wider">
-            Know what goes into every drop.
-          </p>
         </div>
 
-        {/* ── Scroll indicator ──────────────────────────────── */}
         <div
           ref={indicatorRef}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none z-30"
           style={{ willChange: "opacity" }}
         >
-          <span className="text-[10px] tracking-[0.2em] text-white/40 uppercase font-medium">
-            Scroll to explore
+          <span className="text-[11px] tracking-[0.22em] text-white/60 uppercase font-bold animate-pulse">
+            Scroll to discover
           </span>
           <div className="w-[1px] h-12 bg-gradient-to-b from-white/40 to-transparent relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1/2 bg-[#C89B3C] animate-bounce" />

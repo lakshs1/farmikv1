@@ -18,7 +18,7 @@ const PrivacyPolicy = () => {
             Privacy Policy
           </h1>
           <p className="text-emerald-100/90 text-sm max-w-xl mx-auto font-light">
-            At <strong className="font-semibold text-white">myfarmik</strong>, we value your privacy and are committed to protecting your personal information.
+            At <strong className="font-semibold text-white">FARMIK</strong>, we value your privacy and are committed to protecting your personal information.
           </p>
         </div>
       </div>
@@ -37,7 +37,7 @@ const PrivacyPolicy = () => {
               <h2>1. Information We Collect</h2>
             </div>
             <p>
-              When you visit or place an order on <strong className="text-gray-900">myfarmik</strong>, we collect personal details necessary to fulfill your orders and provide a seamless shopping experience:
+              When you visit or place an order on <strong className="text-gray-900">FARMIK</strong>, we collect personal details necessary to fulfill your orders and provide a seamless shopping experience:
             </p>
             <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
               <li><strong>Personal Identifiers:</strong> Name, email address, phone number, and delivery address.</li>
@@ -70,7 +70,7 @@ const PrivacyPolicy = () => {
               <h2>3. Data Protection & Security</h2>
             </div>
             <p>
-              We implement industry-standard physical, electronic, and administrative safeguards. All communications on <strong className="text-gray-900">myfarmik</strong> are encrypted using SSL technology. We never sell, rent, or lease your personal data to third parties.
+              We implement industry-standard physical, electronic, and administrative safeguards. All communications on <strong className="text-gray-900">FARMIK</strong> are encrypted using SSL technology. We never sell, rent, or lease your personal data to third parties.
             </p>
           </section>
 
@@ -92,8 +92,8 @@ const PrivacyPolicy = () => {
               If you have questions, concerns, or requests to update or delete your personal details, please contact our support team at:
             </p>
             <div className="bg-[#FAF9F5] p-4 rounded-xl border border-emerald-900/10 text-xs sm:text-sm">
-              <p className="font-semibold text-gray-900">myfarmik Customer Care</p>
-              <p>Email: <a href="mailto:care@myfarmik.com" className="text-[#2D5A27] underline">care@myfarmik.com</a></p>
+              <p className="font-semibold text-gray-900">FARMIK Customer Care</p>
+              <p>Email: <a href="mailto:care@farmik.com" className="text-[#2D5A27] underline">care@farmik.com</a></p>
               <p>Phone: <a href="tel:08287317599" className="text-[#2D5A27] underline">+91 82873 17599</a></p>
               <p>Address: B-4, Block B, Sector 60, Noida, Uttar Pradesh 201309</p>
             </div>
