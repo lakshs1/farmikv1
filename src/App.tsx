@@ -2,9 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
-import { CartProvider } from "@/hooks/useCart";
+import { useCart } from "@/hooks/useCart";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import Products from "./pages/Products";
@@ -22,6 +22,51 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const LayoutContainer = () => {
+  const location = useLocation();
+  const isAboutPage = location.pathname === "/about";
+
+  return (
+    <div className={`min-h-screen flex flex-col font-sans ${isAboutPage ? "bg-[#0B0A08]" : "bg-[#FAF9F5]"}`}>
+      {!isAboutPage && <Header />}
+      <main className="flex-1">
+        <Routes>
+          {/* Default landing page is the Product Catalog Page */}
+          <Route path="/" element={<Products />} />
+          
+          {/* Shop / Product catalog routes */}
+          <Route path="/shop" element={<Products />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          
+          {/* About Page runs the premium cold-pressed oil scrollytelling */}
+          <Route path="/about" element={<About />} />
+          
+          {/* Other Navigation Pages */}
+          <Route path="/contact" element={<Contact />} />
+          
+          {/* Legal Pages */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
+          
+          {/* User Account & Cart */}
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/auth" element={<Auth />} />
+          
+          {/* Admin Portal */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          
+          {/* Catch-all 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      {!isAboutPage && <Footer />}
+    </div>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -30,39 +75,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <CartProvider>
-            <div className="min-h-screen flex flex-col font-sans bg-[#FAF9F5]">
-              <Header />
-              <main className="flex-1">
-                <Routes>
-                  {/* Default landing page is the Product Catalog Page */}
-                  <Route path="/" element={<Products />} />
-                  <Route path="/shop" element={<Products />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/products/:id" element={<ProductDetail />} />
-                  
-                  {/* Primary Navigation Pages */}
-                  <Route path="/about" element={<About />} />
-                  <Route path="/contact" element={<Contact />} />
-                  
-                  {/* Legal Pages */}
-                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                  <Route path="/terms" element={<TermsAndConditions />} />
-                  
-                  {/* User Account & Cart */}
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/auth" element={<Auth />} />
-                  
-                  {/* Admin Portal */}
-                  <Route path="/admin/login" element={<AdminLogin />} />
-                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                  
-                  {/* Catch-all 404 */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-              <Footer />
-            </div>
+            <LayoutContainer />
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>
