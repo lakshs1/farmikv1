@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
-import { useCart } from "@/hooks/useCart";
+import { CartProvider } from "@/hooks/useCart";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import Products from "./pages/Products";
@@ -24,23 +24,21 @@ const queryClient = new QueryClient();
 
 const LayoutContainer = () => {
   const location = useLocation();
-  const isAboutPage = location.pathname === "/about";
+  const isHome = location.pathname === "/" || location.pathname === "/about";
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans ${isAboutPage ? "bg-[#0B0A08]" : "bg-[#FAF9F5]"}`}>
-      {!isAboutPage && <Header />}
+    <div className={`min-h-screen flex flex-col font-sans ${isHome ? "bg-[#0B0A08]" : "bg-[#FAF9F5]"}`}>
+      <Header />
       <main className="flex-1">
         <Routes>
-          {/* Default landing page is the Product Catalog Page */}
-          <Route path="/" element={<Products />} />
+          {/* Default landing page is the premium cold-pressed oil scrollytelling */}
+          <Route path="/" element={<About />} />
+          <Route path="/about" element={<About />} />
           
           {/* Shop / Product catalog routes */}
           <Route path="/shop" element={<Products />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
-          
-          {/* About Page runs the premium cold-pressed oil scrollytelling */}
-          <Route path="/about" element={<About />} />
           
           {/* Other Navigation Pages */}
           <Route path="/contact" element={<Contact />} />
@@ -62,7 +60,7 @@ const LayoutContainer = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      {!isAboutPage && <Footer />}
+      {!isHome && <Footer />}
     </div>
   );
 };
