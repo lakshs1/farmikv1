@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
-import { Send, Mail, Phone, MapPin, Clock, MessageSquare } from "lucide-react";
+import { Send, Mail, Phone, MapPin, Clock, MessageSquare, MessageCircle } from "lucide-react";
 import farmikLogo from "@/assets/logo-farmik.png";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -38,6 +38,20 @@ const Contact = () => {
     e.preventDefault();
     setSending(true);
 
+    const whatsappMessage = 
+`*FARMIK CONTACT ENQUIRY*
+
+*Name:* ${formData.name.trim()}
+*Email:* ${formData.email.trim()}
+*Phone:* ${formData.phone.trim() || "Not provided"}
+*Subject:* ${formData.subject.trim()}
+
+*Message:*
+${formData.message.trim()}`;
+
+    const whatsappNumber = "918287317599";
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+
     try {
       // Save contact message to Supabase database table contact_messages
       const { error } = await supabase
@@ -60,9 +74,12 @@ const Contact = () => {
       console.warn("Database insert fallback:", err);
     } finally {
       setSending(false);
+      // Open WhatsApp chat in new tab
+      window.open(whatsappUrl, "_blank");
+
       toast({
-        title: "Message Sent Successfully! 📩",
-        description: "Thank you for reaching out to FARMIK. Our team will get back to you within 24 hours.",
+        title: "Message Sent!",
+        description: "Thank you for reaching out to FARMIK. Connecting you to our WhatsApp support team.",
       });
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
     }
@@ -110,6 +127,19 @@ const Contact = () => {
                     care@farmik.com
                   </a>
                   <p className="text-xs text-gray-500">Fast response within 24 hours</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-emerald-50 text-[#25D366] rounded-xl shrink-0">
+                  <MessageCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">WhatsApp Us</p>
+                  <a href="https://wa.me/918287317599" target="_blank" rel="noopener noreferrer" className="text-base font-bold text-gray-900 hover:text-[#25D366] transition-colors">
+                    +91 82873 17599
+                  </a>
+                  <p className="text-xs text-gray-500">Instant chat & order assistance</p>
                 </div>
               </div>
 
@@ -252,13 +282,13 @@ const Contact = () => {
               <button
                 type="submit"
                 disabled={sending}
-                className="w-full py-4 px-6 rounded-xl bg-[#1A3C2A] hover:bg-[#2D5A27] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md disabled:opacity-60"
+                className="w-full py-4 px-6 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg disabled:opacity-60"
               >
                 {sending ? (
                   <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
-                    <Send className="w-4 h-4" /> Send Message
+                    <MessageCircle className="w-4 h-4 fill-white" /> Send Message via WhatsApp
                   </>
                 )}
               </button>
