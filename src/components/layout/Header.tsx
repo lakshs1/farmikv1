@@ -66,43 +66,22 @@ export const Header = () => {
   return (
     <>
       <header
-        className={`${isHome ? "fixed" : "sticky"} top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isHome
-            ? scrolled
-              ? "bg-[#0B0A08]/85 backdrop-blur-md border-b border-white/5 py-3 shadow-lg shadow-black/40"
-              : "bg-transparent border-b border-transparent py-4"
-            : scrolled
-              ? "bg-[#FAF9F5]/90 backdrop-blur-md border-b border-[#1A3C2A]/10 py-3 shadow-xs"
-              : "bg-[#FAF9F5]/40 backdrop-blur-xs border-b border-[#1A3C2A]/5 py-4"
+        className={`${isHome ? "fixed" : "sticky"} top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
+          scrolled
+            ? "border-b border-gray-200/80 shadow-sm"
+            : "border-b border-gray-100 shadow-xs"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between h-16">
             
-            {/* Logo & Brand Name */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="h-10 w-auto flex items-center justify-center">
-                <img
-                  src={farmikLogo}
-                  alt="FARMIK logo"
-                  className="h-10 w-auto transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-              <div className="flex flex-col">
-                <span
-                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                  className={`text-2xl font-bold tracking-tight transition-colors ${
-                    isHome ? "text-white/95" : "text-[#1A3C2A] group-hover:text-[#2D5A27]"
-                  }`}
-                >
-                  FARMIK
-                </span>
-                <span className={`text-[9px] uppercase tracking-[0.2em] font-semibold -mt-1 ${
-                  isHome ? "text-white/40" : "text-[#1A3C2A]/50"
-                }`}>
-                  Purity to your kitchen
-                </span>
-              </div>
+            {/* Logo */}
+            <Link to="/" className="flex items-center group p-0 m-0 leading-none" aria-label="FARMIK Home">
+              <img
+                src={farmikLogo}
+                alt="FARMIK"
+                className="h-14 md:h-16 w-auto max-h-16 object-contain mix-blend-multiply m-0 p-0 block transition-transform duration-300 group-hover:scale-105"
+              />
             </Link>
 
             {/* Desktop Navigation Menu: Shop, About, Contact only */}
@@ -112,21 +91,15 @@ export const Header = () => {
                   key={link.to}
                   to={link.to}
                   className={`relative py-1 text-sm font-medium transition-colors ${
-                    isHome
-                      ? isActive(link.to)
-                        ? "text-white font-semibold"
-                        : "text-white/70 hover:text-white"
-                      : isActive(link.to)
-                        ? "text-[#1A3C2A] font-semibold"
-                        : "text-[#1A3C2A]/70 hover:text-[#1A3C2A]"
+                    isActive(link.to)
+                      ? "text-[#1A3C2A] font-bold"
+                      : "text-[#1A3C2A]/75 hover:text-[#1A3C2A]"
                   }`}
                   style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                 >
                   {link.label}
                   {isActive(link.to) && (
-                    <span className={`absolute bottom-0 left-0 right-0 h-0.5 rounded-full animate-fadeIn ${
-                      isHome ? "bg-[#C89B3C]" : "bg-[#1A3C2A]"
-                    }`} />
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-[#1A3C2A] animate-fadeIn" />
                   )}
                 </Link>
               ))}
@@ -138,11 +111,7 @@ export const Header = () => {
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
                 aria-label="Search"
-                className={`p-2.5 rounded-full transition-all ${
-                  isHome
-                    ? "text-white/70 hover:text-white hover:bg-white/10"
-                    : "text-[#1A3C2A]/70 hover:text-[#1A3C2A] hover:bg-[#1A3C2A]/5"
-                }`}
+                className="p-2.5 rounded-full transition-all text-[#1A3C2A]/75 hover:text-[#1A3C2A] hover:bg-[#1A3C2A]/5"
               >
                 <Search className="h-5 w-5" />
               </button>
@@ -150,18 +119,12 @@ export const Header = () => {
               {/* Cart Button */}
               <Link
                 to="/cart"
-                className={`relative p-2.5 rounded-full transition-all ${
-                  isHome
-                    ? "text-white/70 hover:text-white hover:bg-white/10"
-                    : "text-[#1A3C2A]/70 hover:text-[#1A3C2A] hover:bg-[#1A3C2A]/5"
-                }`}
+                className="relative p-2.5 rounded-full transition-all text-[#1A3C2A]/75 hover:text-[#1A3C2A] hover:bg-[#1A3C2A]/5"
                 aria-label="Shopping Cart"
               >
                 <ShoppingCart className="h-5 w-5" />
                 {cartItemCount > 0 && (
-                  <span className={`absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full text-xs font-bold flex items-center justify-center shadow-sm ${
-                    isHome ? "bg-[#C89B3C] text-black" : "bg-[#1A3C2A] text-white"
-                  }`}>
+                  <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full text-xs font-bold flex items-center justify-center shadow-sm bg-[#1A3C2A] text-white">
                     {cartItemCount}
                   </span>
                 )}
@@ -169,25 +132,17 @@ export const Header = () => {
 
               {/* User Profile / Auth */}
               {user ? (
-                <div className={`hidden md:flex items-center gap-2 border-l pl-3 ml-1 ${
-                  isHome ? "border-white/10" : "border-[#1A3C2A]/10"
-                }`}>
+                <div className="hidden md:flex items-center gap-2 border-l border-[#1A3C2A]/15 pl-3 ml-1">
                   <Link
                     to="/profile"
-                    className={`p-2.5 rounded-full transition-all flex items-center gap-2 ${
-                      isHome
-                        ? "text-white/70 hover:text-white hover:bg-white/10"
-                        : "text-[#1A3C2A]/70 hover:text-[#1A3C2A] hover:bg-[#1A3C2A]/5"
-                    }`}
+                    className="p-2.5 rounded-full transition-all flex items-center gap-2 text-[#1A3C2A]/75 hover:text-[#1A3C2A] hover:bg-[#1A3C2A]/5"
                     title="Profile"
                   >
                     <User className="h-5 w-5" />
                   </Link>
                   <button
                     onClick={signOut}
-                    className={`text-xs font-semibold px-2 py-1 rounded transition-colors ${
-                      isHome ? "text-white/60 hover:text-[#C89B3C]" : "text-[#1A3C2A]/60 hover:text-red-700"
-                    }`}
+                    className="text-xs font-semibold px-2 py-1 rounded transition-colors text-[#1A3C2A]/70 hover:text-red-700"
                   >
                     Sign Out
                   </button>
@@ -195,11 +150,7 @@ export const Header = () => {
               ) : (
                 <Link
                   to="/auth"
-                  className={`hidden md:inline-flex items-center justify-center px-4 py-2 text-xs font-semibold tracking-wider rounded-lg transition-all shadow-xs ${
-                    isHome
-                      ? "text-[#C89B3C] border border-[#C89B3C]/40 hover:bg-[#C89B3C] hover:text-black"
-                      : "text-[#1A3C2A] border border-[#1A3C2A]/30 hover:bg-[#1A3C2A] hover:text-white"
-                  }`}
+                  className="hidden md:inline-flex items-center justify-center px-4 py-2 text-xs font-semibold tracking-wider rounded-lg transition-all shadow-xs text-[#1A3C2A] border border-[#1A3C2A]/30 hover:bg-[#1A3C2A] hover:text-white"
                 >
                   SIGN IN
                 </Link>
@@ -207,9 +158,7 @@ export const Header = () => {
 
               {/* Mobile Menu Hamburger */}
               <button
-                className={`md:hidden p-2.5 rounded-lg ${
-                  isHome ? "text-white/80 hover:bg-white/10" : "text-[#1A3C2A]/80 hover:bg-[#1A3C2A]/5"
-                }`}
+                className="md:hidden p-2.5 rounded-lg text-[#1A3C2A]/80 hover:bg-[#1A3C2A]/5"
                 onClick={() => setDrawerOpen(true)}
                 aria-label="Open navigation menu"
               >
@@ -221,11 +170,7 @@ export const Header = () => {
 
         {/* Dropdown Search Bar */}
         {searchOpen && (
-          <div className={`border-t px-4 py-3 shadow-md animate-fadeIn ${
-            isHome
-              ? "border-white/10 bg-[#0B0A08]/95 backdrop-blur-lg"
-              : "border-[#1A3C2A]/10 bg-[#FAF9F5]/95 backdrop-blur-lg"
-          }`}>
+          <div className="border-t border-gray-200 bg-white px-4 py-3 shadow-md animate-fadeIn">
             <form onSubmit={handleSearch} className="max-w-3xl mx-auto flex items-center gap-3">
               <Search className="h-5 w-5 text-gray-400 shrink-0" />
               <input
@@ -234,9 +179,7 @@ export const Header = () => {
                 placeholder="Search pure mustard oil, cold-pressed oils..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`flex-1 bg-transparent text-sm outline-none py-1 ${
-                  isHome ? "text-white placeholder:text-white/30" : "text-[#1A3C2A] placeholder:text-[#1A3C2A]/30"
-                }`}
+                className="flex-1 bg-transparent text-sm outline-none py-1 text-[#1A3C2A] placeholder:text-[#1A3C2A]/40"
               />
               <button
                 type="button"
@@ -254,33 +197,21 @@ export const Header = () => {
       {drawerOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
             onClick={() => setDrawerOpen(false)}
           />
-          <div className={`relative w-4/5 max-w-xs h-full shadow-2xl z-10 flex flex-col p-6 overflow-y-auto ${
-            isHome ? "bg-[#0B0A08] text-white border-l border-white/5" : "bg-[#FAF9F5] text-[#1A3C2A] border-l border-[#1A3C2A]/5"
-          }`}>
-            <div className={`flex items-center justify-between pb-6 border-b ${
-              isHome ? "border-white/5" : "border-[#1A3C2A]/5"
-            }`}>
-              <div className="flex items-center gap-2">
+          <div className="relative w-4/5 max-w-xs h-full shadow-2xl z-10 flex flex-col p-6 overflow-y-auto bg-white text-[#1A3C2A] border-l border-gray-200">
+            <div className="flex items-center justify-between pb-6 border-b border-gray-100">
+              <Link to="/" onClick={() => setDrawerOpen(false)} className="flex items-center">
                 <img
                   src={farmikLogo}
                   alt="FARMIK"
-                  className="h-8 w-auto"
+                  className="h-10 w-auto mix-blend-multiply"
                 />
-                <span
-                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                  className={`text-2xl font-bold ${isHome ? "text-white/95" : "text-[#1A3C2A]"}`}
-                >
-                  FARMIK
-                </span>
-              </div>
+              </Link>
               <button
                 onClick={() => setDrawerOpen(false)}
-                className={`p-2 transition-colors ${
-                  isHome ? "text-white/55 hover:text-white" : "text-[#1A3C2A]/55 hover:text-[#1A3C2A]"
-                }`}
+                className="p-2 transition-colors text-[#1A3C2A]/60 hover:text-[#1A3C2A]"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -294,12 +225,8 @@ export const Header = () => {
                   onClick={() => setDrawerOpen(false)}
                   className={`py-3 px-4 rounded-lg text-base font-medium transition-colors ${
                     isActive(link.to)
-                      ? isHome
-                        ? "bg-white/10 text-white font-semibold"
-                        : "bg-[#1A3C2A]/10 text-[#1A3C2A] font-semibold"
-                      : isHome
-                        ? "text-white/70 hover:bg-white/5"
-                        : "text-[#1A3C2A]/70 hover:bg-[#1A3C2A]/5"
+                      ? "bg-[#1A3C2A]/10 text-[#1A3C2A] font-semibold"
+                      : "text-[#1A3C2A]/75 hover:bg-[#1A3C2A]/5"
                   }`}
                 >
                   {link.label}
@@ -307,26 +234,20 @@ export const Header = () => {
               ))}
             </nav>
 
-            <div className={`mt-auto pt-6 border-t flex flex-col gap-3 ${
-              isHome ? "border-white/5" : "border-[#1A3C2A]/5"
-            }`}>
+            <div className="mt-auto pt-6 border-t border-gray-100 flex flex-col gap-3">
               {user ? (
                 <>
                   <Link
                     to="/profile"
                     onClick={() => setDrawerOpen(false)}
-                    className={`flex items-center gap-3 py-2.5 px-4 rounded-lg ${
-                      isHome ? "text-white/70 hover:bg-white/5" : "text-[#1A3C2A]/70 hover:bg-[#1A3C2A]/5"
-                    }`}
+                    className="flex items-center gap-3 py-2.5 px-4 rounded-lg text-[#1A3C2A]/75 hover:bg-[#1A3C2A]/5"
                   >
                     <User className="h-5 w-5" />
                     <span>My Account</span>
                   </Link>
                   <button
                     onClick={() => { signOut(); setDrawerOpen(false); }}
-                    className={`text-left text-sm font-semibold px-4 py-2 rounded-lg ${
-                      isHome ? "text-red-400 hover:bg-red-950/20" : "text-red-600 hover:bg-red-50"
-                    }`}
+                    className="text-left text-sm font-semibold px-4 py-2 rounded-lg text-red-600 hover:bg-red-50"
                   >
                     Sign Out
                   </button>
@@ -335,9 +256,7 @@ export const Header = () => {
                 <Link
                   to="/auth"
                   onClick={() => setDrawerOpen(false)}
-                  className={`w-full text-center py-3 font-semibold text-sm rounded-lg shadow-sm ${
-                    isHome ? "bg-[#C89B3C] text-black" : "bg-[#1A3C2A] text-white"
-                  }`}
+                  className="w-full text-center py-3 font-semibold text-sm rounded-lg shadow-sm bg-[#1A3C2A] text-white"
                 >
                   Sign In / Register
                 </Link>
