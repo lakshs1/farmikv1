@@ -10,6 +10,7 @@ import { Footer } from "@/components/layout/Footer";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import About from "./pages/About";
+import OfferDetail from "./pages/OfferDetail";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
@@ -39,6 +40,7 @@ const LayoutContainer = () => {
           <Route path="/shop" element={<Products />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/offers/:id" element={<OfferDetail />} />
           
           {/* Other Navigation Pages */}
           <Route path="/contact" element={<Contact />} />
