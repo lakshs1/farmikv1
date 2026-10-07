@@ -93,8 +93,10 @@ const Cart = () => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [promoApplying, setPromoApplying] = useState(false);
 
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
   const { user, loading: authLoading } = useAuth();
-  const { items: hookItems } = useCart();
+  const { items: hookItems, clearCart } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -340,8 +342,8 @@ const Cart = () => {
     });
   };
 
-  // WhatsApp Checkout Workflow
-  const handleWhatsAppCheckout = () => {
+  // WhatsApp Checkout Workflow: Saves order in database first, then opens WhatsApp
+  const handleWhatsAppCheckout = async () => {
     if (!user || cartItems.length === 0) {
       toast({
         title: "Empty Cart",
@@ -360,26 +362,103 @@ const Cart = () => {
       return;
     }
 
-    const subtotal = calculateSubtotal().toFixed(2);
-    const finalAmount = calculateFinalTotal().toFixed(2);
-    const totalQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    const finalName = customerName.trim() || user?.user_metadata?.full_name || "Customer";
-    const finalPhone = customerPhone.trim() || user?.user_metadata?.phone || "Not provided";
-    const finalEmail = user?.email || "Not provided";
+    if (!customerPhone || customerPhone.trim().length === 0) {
+      toast({
+        title: "Phone Number Required",
+        description: "Please provide your phone number for delivery coordination.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    const itemsSummary = cartItems
-      .map(
-        (item, idx) =>
-          `${idx + 1}. *${item.product.name}*\n   • Qty: ${item.quantity}\n   • Selling Price: ₹${(item.product.price * item.quantity).toFixed(2)} (₹${item.product.price.toFixed(2)} each)`
-      )
-      .join("\n\n");
+    setIsPlacingOrder(true);
 
-    const promoDetails = appliedPromo
-      ? `\n• *Promo Code Applied:* ${appliedPromo.code} (-₹${discountAmount.toFixed(2)})`
-      : "";
+    try {
+      const subtotal = calculateSubtotal().toFixed(2);
+      const finalAmount = calculateFinalTotal().toFixed(2);
+      const totalQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+      const finalName = customerName.trim() || user?.user_metadata?.full_name || "Customer";
+      const finalPhone = customerPhone.trim() || user?.user_metadata?.phone || "Not provided";
+      const finalEmail = user?.email || "Not provided";
 
-    const whatsappMessage =
-      `*FARMIK ORDER REQUEST*
+      const orderRefFallback = `ORD-${Date.now().toString(36).toUpperCase()}`;
+      let displayOrderRef = orderRefFallback;
+      let createdDbOrderId: string | null = null;
+
+      // 1. Insert order into Supabase `orders` table
+      try {
+        const fullShippingAddress = `${finalName} | Phone: ${finalPhone} | Address: ${shippingAddress.trim()}`;
+        const { data: orderData, error: orderError } = await supabase
+          .from('orders')
+          .insert({
+            user_id: user.id,
+            total_amount: Number(finalAmount),
+            shipping_address: fullShippingAddress,
+            status: 'pending',
+            payment_id: `wa_upi_${Date.now()}`
+          })
+          .select('id, created_at')
+          .single();
+
+        if (!orderError && orderData) {
+          createdDbOrderId = orderData.id;
+          displayOrderRef = `#ORD-${orderData.id.slice(0, 8).toUpperCase()}`;
+
+          // 2. Insert order items if product_id is valid
+          const itemsToInsert = cartItems
+            .filter((it) => it.product_id && !it.product_id.startsWith('f'))
+            .map((it) => ({
+              order_id: orderData.id,
+              product_id: it.product_id,
+              quantity: it.quantity,
+              price: it.product.price,
+            }));
+
+          if (itemsToInsert.length > 0) {
+            try {
+              await supabase.from('order_items').insert(itemsToInsert);
+            } catch (itemsErr) {
+              console.warn("Could not insert order_items:", itemsErr);
+            }
+          }
+        } else if (orderError) {
+          console.warn("Order table insert warning:", orderError);
+        }
+      } catch (dbErr) {
+        console.warn("Database order saving error:", dbErr);
+      }
+
+      // 3. Update user profile details
+      try {
+        await supabase
+          .from('profiles')
+          .upsert({
+            user_id: user.id,
+            full_name: finalName,
+            phone: finalPhone,
+            address: shippingAddress.trim(),
+            role: 'customer'
+          }, { onConflict: 'user_id' });
+      } catch (pErr) {
+        console.warn("Profile update warning:", pErr);
+      }
+
+      // 4. Construct WhatsApp message with Order ID and item details
+      const itemsSummary = cartItems
+        .map(
+          (item, idx) =>
+            `${idx + 1}. *${item.product.name}*\n   • Qty: ${item.quantity}\n   • Selling Price: ₹${(item.product.price * item.quantity).toFixed(2)} (₹${item.product.price.toFixed(2)} each)`
+        )
+        .join("\n\n");
+
+      const promoDetails = appliedPromo
+        ? `\n• *Promo Code Applied:* ${appliedPromo.code} (-₹${discountAmount.toFixed(2)})`
+        : "";
+
+      const whatsappMessage =
+        `*FARMIK ORDER REQUEST*
+*Order Reference:* ${displayOrderRef}
+*Date:* ${new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
 
 *Customer Details:*
 • *Name:* ${finalName}
@@ -394,20 +473,46 @@ ${itemsSummary}
 ━━━━━━━━━━━━━━━━━━━
 *Items Subtotal:* ₹${subtotal}${promoDetails}
 *Final Payable Total:* ₹${finalAmount}
+*Payment Method:* Direct UPI on WhatsApp
+*Order Status:* Pending Confirmation
 ━━━━━━━━━━━━━━━━━━━
 
 *Payment:*
-I would like to place this order and pay directly here on WhatsApp. Please share your UPI ID / Payment QR code to confirm my order. Thank you!`;
+I have submitted this order in the system (Ref: ${displayOrderRef}). Please share your UPI QR code / UPI ID to confirm payment and dispatch my order. Thank you!`;
 
-    const whatsappNumber = "918287317599";
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+      const whatsappNumber = "918287317599";
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
-    window.open(whatsappUrl, "_blank");
+      // 5. Clear cart in Supabase & local state
+      try {
+        await supabase.from('cart').delete().eq('user_id', user.id);
+      } catch (cErr) {
+        console.warn("Cart delete warning:", cErr);
+      }
+      try {
+        await clearCart();
+      } catch (hookErr) {
+        console.warn("Hook clearCart warning:", hookErr);
+      }
+      setCartItems([]);
 
-    toast({
-      title: "Opening WhatsApp",
-      description: "Redirecting to WhatsApp to complete your order.",
-    });
+      // 6. Open WhatsApp window
+      window.open(whatsappUrl, "_blank");
+
+      toast({
+        title: "Order Placed & Recorded!",
+        description: `Order ${displayOrderRef} saved to your history. Redirecting to WhatsApp for payment.`,
+      });
+    } catch (err: any) {
+      console.error("WhatsApp checkout error:", err);
+      toast({
+        title: "Checkout Error",
+        description: err.message || "Failed to process order. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
 
   if (authLoading || loading) {
@@ -689,14 +794,24 @@ I would like to place this order and pay directly here on WhatsApp. Please share
                 {/* WhatsApp Order Button */}
                 <Button
                   onClick={handleWhatsAppCheckout}
-                  className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-2.5 h-auto text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                  disabled={isPlacingOrder || cartItems.length === 0}
+                  className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 h-auto text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all disabled:opacity-60"
                 >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  <span>Order on WhatsApp</span>
+                  {isPlacingOrder ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Saving Order & Opening WhatsApp...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center space-x-2">
+                      <MessageCircle className="w-4 h-4" />
+                      <span>Order on WhatsApp</span>
+                    </div>
+                  )}
                 </Button>
 
                 <p className="text-[10px] text-gray-400 text-center">
-                  Direct payment via UPI QR code on WhatsApp.
+                  Order will be recorded in your profile &amp; admin dashboard. Direct UPI QR payment on WhatsApp.
                 </p>
               </div>
             </div>
