@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { CheckCircle, ShoppingBag, ArrowRight, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/hooks/useCart";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
