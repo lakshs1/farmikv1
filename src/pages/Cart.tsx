@@ -10,7 +10,7 @@ import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, MessageCircle, MapPin, Tag, X } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, MessageCircle, MapPin, Tag, X, CreditCard, Loader2 } from "lucide-react";
 import { PromoCode, validatePromoCode } from "@/integrations/supabase/offers-and-sliders";
 
 interface Product {
@@ -94,6 +94,7 @@ const Cart = () => {
   const [promoApplying, setPromoApplying] = useState(false);
 
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [isPhonePePaying, setIsPhonePePaying] = useState(false);
 
   const { user, loading: authLoading } = useAuth();
   const { items: hookItems, clearCart } = useCart();
@@ -500,8 +501,8 @@ I have submitted this order in the system (Ref: ${displayOrderRef}). Please shar
       window.open(whatsappUrl, "_blank");
 
       toast({
-        title: "Order Placed & Recorded!",
-        description: `Order ${displayOrderRef} saved to your history. Redirecting to WhatsApp for payment.`,
+        title: "Order Placed!",
+        description: `Redirecting to WhatsApp to complete your order.`,
       });
     } catch (err: any) {
       console.error("WhatsApp checkout error:", err);
@@ -514,6 +515,197 @@ I have submitted this order in the system (Ref: ${displayOrderRef}). Please shar
       setIsPlacingOrder(false);
     }
   };
+
+  // PhonePe Payment Handler — calls the deployed create-phonepe-order edge function
+  const handlePhonePeCheckout = async () => {
+    if (!user || cartItems.length === 0) {
+      toast({
+        title: "Empty Cart",
+        description: "Your cart is empty. Please add items before checking out.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!shippingAddress || shippingAddress.trim().length === 0) {
+      toast({
+        title: "Address Required",
+        description: "Please provide your delivery address before proceeding.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!customerPhone || customerPhone.trim().length === 0) {
+      toast({
+        title: "Phone Number Required",
+        description: "Please provide your phone number for delivery coordination.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsPhonePePaying(true);
+
+    let createdDbOrderId: string | null = null;
+    const merchantOrderId = `ORD${Date.now()}`;
+
+    try {
+      const finalAmount = calculateFinalTotal();
+      const finalName   = customerName.trim() || user?.user_metadata?.full_name || "Customer";
+      const finalPhone  = customerPhone.trim() || user?.user_metadata?.phone || "";
+      const finalEmail  = user?.email || "";
+      const fullShippingAddress = `${finalName} | Phone: ${finalPhone} | Address: ${shippingAddress.trim()}`;
+
+      // 1. Instantly record order in database with payment_status: 'unsuccessful'
+      // It stays 'unsuccessful' if payment is cancelled/failed, and becomes 'success' when payment succeeds
+      try {
+        const { data: orderData, error: orderError } = await supabase
+          .from("orders")
+          .insert({
+            user_id: user.id,
+            total_amount: Number(finalAmount),
+            shipping_address: fullShippingAddress,
+            status: "pending",
+            payment_status: "unsuccessful",
+            payment_gateway: "phonepe",
+            payment_id: merchantOrderId,
+          })
+          .select("id")
+          .single();
+
+        if (orderData && !orderError) {
+          createdDbOrderId = orderData.id;
+          const itemsToInsert = cartItems
+            .filter((it) => it.product_id && !it.product_id.startsWith("f"))
+            .map((it) => ({
+              order_id: orderData.id,
+              product_id: it.product_id,
+              quantity: it.quantity,
+              price: it.product.price,
+            }));
+
+          if (itemsToInsert.length > 0) {
+            await supabase.from("order_items").insert(itemsToInsert);
+          }
+        }
+      } catch (dbErr) {
+        console.warn("[PhonePe] Instant order insert warning:", dbErr);
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const anonKey     = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+      // PhonePe API expects amounts in PAISE (1 INR = 100 Paise).
+      // Converting ₹575 -> 57500 paise so PhonePe checkout charges ₹575.00 (not ₹5.75)
+      const amountInPaise = Math.round(Number(finalAmount) * 100);
+
+      console.log("[PhonePe] Calling create-phonepe-order | amount in paise:", amountInPaise, "(₹" + finalAmount + ")");
+
+      const res = await fetch(`${supabaseUrl}/functions/v1/create-phonepe-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type":  "application/json",
+          "Authorization": `Bearer ${accessToken || anonKey}`,
+          "apikey":        anonKey,
+        },
+        body: JSON.stringify({
+          // ── amount in paise (e.g. 57500 for ₹575) ──
+          amount: amountInPaise,
+          customer: {
+            name:    finalName,
+            phone:   finalPhone,
+            email:   finalEmail,
+            address: shippingAddress.trim(),
+          },
+          cartItems: cartItems.map((it) => ({
+            product_id: it.product_id,
+            name:       it.product.name,
+            quantity:   it.quantity,
+            price:      it.product.price,
+          })),
+          userId:        user.id,
+          discountAmount,
+          promoCode:     appliedPromo?.code || null,
+        }),
+      });
+
+      const resText = await res.text();
+      console.log("[PhonePe] create-phonepe-order status:", res.status);
+      console.log("[PhonePe] create-phonepe-order response:", resText);
+
+      if (!res.ok) {
+        if (createdDbOrderId) {
+          await supabase.from("orders").update({
+            status: "cancelled",
+            payment_status: "unsuccessful",
+          }).eq("id", createdDbOrderId);
+        }
+        let errMsg = "Payment initiation failed. Please try again.";
+        try {
+          const errData = JSON.parse(resText);
+          errMsg = errData.error || errMsg;
+        } catch {}
+        throw new Error(errMsg);
+      }
+
+      const data = JSON.parse(resText);
+
+      // PhonePe v2 returns redirectUrl (checkout page URL)
+      const checkoutUrl =
+        data?.checkoutUrl ||
+        data?.redirectUrl ||
+        data?.data?.redirectUrl ||
+        data?.data?.instrumentResponse?.redirectInfo?.url ||
+        null;
+
+      if (!checkoutUrl) {
+        if (createdDbOrderId) {
+          await supabase.from("orders").update({
+            status: "cancelled",
+            payment_status: "unsuccessful",
+          }).eq("id", createdDbOrderId);
+        }
+        console.error("[PhonePe] No checkoutUrl in response:", resText);
+        throw new Error(
+          "PhonePe did not return a checkout URL. " +
+          (data?.error || data?.message || "Please try again.")
+        );
+      }
+
+      // Update user profile
+      try {
+        await supabase.from("profiles").upsert({
+          user_id:   user.id,
+          full_name: finalName,
+          phone:     finalPhone,
+          address:   shippingAddress.trim(),
+          role:      "customer",
+        }, { onConflict: "user_id" });
+      } catch (pErr) {
+        console.warn("[PhonePe] Profile update warning:", pErr);
+      }
+
+      toast({
+        title: "Connecting to PhonePe...",
+        description: "Redirecting to complete payment securely.",
+      });
+
+      // Redirect user to PhonePe's hosted payment page
+      window.location.href = checkoutUrl;
+
+    } catch (err: any) {
+      console.error("[PhonePe] Checkout error:", err);
+      toast({
+        title: "Payment Error",
+        description: err.message || "Failed to initiate payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPhonePePaying(false);
+    }
+  };
+
 
   if (authLoading || loading) {
     return (
@@ -791,16 +983,45 @@ I have submitted this order in the system (Ref: ${displayOrderRef}). Please shar
                   </div>
                 </div>
 
+                {/* PhonePe Pay Button – Green Primary CTA */}
+                <Button
+                  onClick={handlePhonePeCheckout}
+                  disabled={isPhonePePaying || isPlacingOrder || cartItems.length === 0}
+                  className="w-full bg-[#1A3C2A] hover:bg-[#235038] text-white py-3.5 h-auto text-sm font-bold rounded-xl shadow-md transition-all disabled:opacity-60 relative overflow-hidden group"
+                >
+                  {isPhonePePaying ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                      <span>Connecting to PhonePe...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center space-x-2">
+                      <CreditCard className="w-4 h-4 text-emerald-400" />
+                      <span>Pay with PhonePe</span>
+                      <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-semibold text-emerald-100">UPI / Cards / NetBanking</span>
+                    </div>
+                  )}
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+                </Button>
+
+                {/* Divider */}
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-px bg-gray-200" />
+                  <span className="text-[10px] text-gray-400 font-medium">OR</span>
+                  <div className="flex-1 h-px bg-gray-200" />
+                </div>
+
                 {/* WhatsApp Order Button */}
                 <Button
                   onClick={handleWhatsAppCheckout}
-                  disabled={isPlacingOrder || cartItems.length === 0}
+                  disabled={isPlacingOrder || isPhonePePaying || cartItems.length === 0}
                   className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 h-auto text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all disabled:opacity-60"
                 >
                   {isPlacingOrder ? (
                     <div className="flex items-center justify-center space-x-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Saving Order & Opening WhatsApp...</span>
+                      <span>Opening WhatsApp...</span>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center space-x-2">
@@ -811,7 +1032,7 @@ I have submitted this order in the system (Ref: ${displayOrderRef}). Please shar
                 </Button>
 
                 <p className="text-[10px] text-gray-400 text-center">
-                  Order will be recorded in your profile &amp; admin dashboard. Direct UPI QR payment on WhatsApp.
+                  🔒 100% Safe &amp; Secure Payments
                 </p>
               </div>
             </div>
