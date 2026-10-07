@@ -109,6 +109,96 @@ const Cart = () => {
     }
   }, [authLoading, user]);
 
+  // Handle return from PhonePe checkout (only toast popups, no separate screen)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const phonepeOrderId = urlParams.get("phonepe_order_id") || urlParams.get("orderId");
+    
+    if (!phonepeOrderId || !user) return;
+
+    // Clean up query param from URL bar immediately
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    const verifyPhonePeReturn = async () => {
+      try {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const anonKey     = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData?.session?.access_token;
+
+        // Ask the edge function to verify status directly with PhonePe
+        let isSuccess = false;
+        try {
+          const checkRes = await fetch(`${supabaseUrl}/functions/v1/create-phonepe-order`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${accessToken || anonKey}`,
+              "apikey": anonKey,
+            },
+            body: JSON.stringify({
+              action: "check_status",
+              merchantOrderId: phonepeOrderId,
+            }),
+          });
+          const checkData = await checkRes.json();
+          isSuccess = Boolean(checkData?.isSuccess);
+        } catch (e) {
+          console.warn("[PhonePe] Direct status check error, falling back to DB lookup:", e);
+        }
+
+        // Double check DB status if direct check was inconclusive
+        if (!isSuccess) {
+          const { data: order } = await supabase
+            .from("orders")
+            .select("status, payment_status")
+            .or(`payment_id.eq.${phonepeOrderId},id.eq.${phonepeOrderId}`)
+            .maybeSingle();
+
+          if (order && (order.payment_status === "success" || order.status === "paid")) {
+            isSuccess = true;
+          }
+        }
+
+        if (isSuccess) {
+          // PAYMENT SUCCESS: Show success toast and clear cart
+          toast({
+            title: "Payment Successful!",
+            description: "Your order has been placed successfully.",
+          });
+          try {
+            await supabase.from("cart").delete().eq("user_id", user.id);
+            await clearCart();
+            setCartItems([]);
+          } catch (cErr) {
+            console.warn("Cart clearing error:", cErr);
+          }
+        } else {
+          // PAYMENT FAILED / CANCELLED: Show error toast and keep cart items as is
+          toast({
+            title: "Payment Cancelled or Failed",
+            description: "Your payment was not completed. Your cart items are still in your cart.",
+            variant: "destructive",
+          });
+          try {
+            await supabase
+              .from("orders")
+              .update({ status: "cancelled", payment_status: "unsuccessful" })
+              .or(`payment_id.eq.${phonepeOrderId},id.eq.${phonepeOrderId}`);
+          } catch (uErr) {
+            console.warn("Order status update error:", uErr);
+          }
+          // Reload cart items to ensure user sees them
+          fetchCartItems();
+        }
+      } catch (err) {
+        console.error("Error verifying PhonePe return:", err);
+      }
+    };
+
+    verifyPhonePeReturn();
+  }, [user]);
+
   const fetchUserProfile = async () => {
     if (!user) return;
     try {
@@ -613,7 +703,7 @@ I have submitted this order in the system (Ref: ${displayOrderRef}). Please shar
           // ── amount in paise (e.g. 57500 for ₹575) ──
           amount: amountInPaise,
           merchantOrderId: merchantOrderId,
-          redirectUrl: `${window.location.origin}/payment-success?orderId=${createdDbOrderId || merchantOrderId}`,
+          redirectUrl: `${window.location.origin}/cart?phonepe_order_id=${merchantOrderId}`,
           customer: {
             name:    finalName,
             phone:   finalPhone,
