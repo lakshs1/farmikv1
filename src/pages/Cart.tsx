@@ -612,6 +612,8 @@ I have submitted this order in the system (Ref: ${displayOrderRef}). Please shar
         body: JSON.stringify({
           // ── amount in paise (e.g. 57500 for ₹575) ──
           amount: amountInPaise,
+          merchantOrderId: merchantOrderId,
+          redirectUrl: `${window.location.origin}/payment-success?orderId=${createdDbOrderId || merchantOrderId}`,
           customer: {
             name:    finalName,
             phone:   finalPhone,

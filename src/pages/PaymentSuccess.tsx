@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { CheckCircle, ShoppingBag, ArrowRight, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useCart } from "@/contexts/CartContext";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { clearCart } = useCart();
   const [countdown, setCountdown] = useState(8);
 
   const orderId  = searchParams.get("orderId") || "";
@@ -13,6 +16,32 @@ const PaymentSuccess = () => {
   const shortRef = orderRef ? `#${orderRef}` : orderId ? `#ORD-${orderId.slice(0, 8).toUpperCase()}` : "";
 
   useEffect(() => {
+    // 1. Immediately clear cart locally & in Supabase
+    const cleanupCartAndOrder = async () => {
+      try {
+        clearCart();
+      } catch {}
+
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from("cart").delete().eq("user_id", user.id);
+        }
+
+        // Also ensure order is marked paid/success
+        if (orderId) {
+          await supabase
+            .from("orders")
+            .update({ status: "paid", payment_status: "success" })
+            .or(`id.eq.${orderId},payment_id.eq.${orderId}`);
+        }
+      } catch (err) {
+        console.warn("Success page cleanup warning:", err);
+      }
+    };
+
+    cleanupCartAndOrder();
+
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -24,7 +53,7 @@ const PaymentSuccess = () => {
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [navigate]);
+  }, [navigate, orderId, clearCart]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0d2b1a] via-[#1A3C2A] to-[#0d2b1a] flex items-center justify-center px-4">
